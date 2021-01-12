@@ -64,6 +64,6 @@ Git에서 관리하면 안되는 파일/폴더 혹은 올리고 싶지 않은 �
 - 클론, 가입은 스킵....
 
 ## Commit & Push 하기
-![git01](./img/git01.png)
-![git02](./img/git02.png)
-![git03](./img/git03.png)
+![git01](/img/git01.PNG)
+![git02](/img/git02.PNG)
+![git03](/img/git03.PNG)
