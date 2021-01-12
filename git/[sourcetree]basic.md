@@ -57,3 +57,13 @@ GitHub는 이러한 Git repo를 인터넷 상에서 제공하는 서비스(호�
 ## .gitignore
 Git에서 관리하면 안되는 파일/폴더 혹은 올리고 싶지 않은 파일/폴더를 미리 지정하여 관리 대상에서 제외시키기 위해 있는 파일.     
 [gitignore 파일 설정 및 반영](https://blog.naver.com/PostView.nhn?blogId=simpolor&logNo=221065977618&categoryNo=27&parentCategoryNo=0&viewDate=&currentPage=1&postListTopCurrentPage=&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=1)
+
+-----
+# Source Tree
+더 쉽게 git 사용하기 위해 사용함.
+- 클론, 가입은 스킵....
+
+## Commit & Push 하기
+![git01](/img/git01.png)
+![git02](/img/git02.png)
+![git03](/img/git03.png)
