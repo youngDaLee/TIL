@@ -15,3 +15,6 @@
 - 일주일 5문제 이상씩 알고리즘 문제 풀이.
 - 코드는 [Daily-Algorithm](https://github.com/youngDaLee/Daily-Algorithm)에 올리고
 - 정리할 개념 [Algorithm](./Algorithm)폴더에 정리하기.
+
+### git
+- git 개념 배운거 [git](./git)폴더에 정리
