@@ -39,7 +39,7 @@
   - 부분 배열은 a[0 ... k-1] 에서 a[0 ... k]로 증가
 #### 알고리즘 구현
 c++
-```
+```c++
 void insert(int x, int n, int b[]){
     int i, j;
     for(i = 0; i<n ; i++){
@@ -50,7 +50,33 @@ void insert(int x, int n, int b[]){
 }
 ```
 ### 2.2. 버블 정렬(bubble sort)
+- 교환을 통해 더 작은 원소를 앞으로 보냄
+- 서로 인접한 원소들 사이의 교환을 반복해서 정렬을 수행
 
+#### 기본 개념
+- 배열의 가장 앞자리에 최소값을 옮김
+  - 배열의 가장 뒷자리로부터 원소들을 차례로 비교하면서 작은 값을 가장 앞 자리로 옮김
+- 배열의 두번째 자리에 두번째 작은 값을 옮김
+- 이 과정을 n-1번 반복
+- Sinking sort라고도 함
+#### 알고리즘 설계
+c++
+```c++
+void swap(int* a, int* b){
+  int x = a;
+  a = b;
+  b = x;
+}
+
+void bubble_sort(int n, int a[]){
+  for(int i = 0; i<n-1; i++){
+    for(int j = n-1; j>i; j--){
+      if(a[j-1]>a[j])
+        swap(a[j-1], a[j]);
+    }
+  }
+}
+```
 ### 2.3. 선택 정렬(selection sort)
 가장 이해하기 쉬운 정렬 방법.
 - 추가(insert) 연산에 기반한 정렬 알고리즘
