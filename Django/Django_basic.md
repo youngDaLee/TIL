@@ -108,9 +108,29 @@ DATABASES = {
 4. 지정 마이그레이션의 SQL 내역
    - `python manage.py sqlmigrate`     
 
-1, 2번 명령 계속 **반복**을 통해 클래스에 반영하는 수정사항들이 지속적으로 DB에 반영됨.
+1, 2번 명령 계속 **반복**을 통해 클래스에 반영하는 수정사항들이 지속적으로 DB에 반영됨.   
+
+#### 서버 실행
+`python manage.py runserver` 으로 서버 실행
 
 ### 2-2. Admin
+장고의 관리자 페이지를 설정하는 단원.   
+먼저, fc_community/fc_community/urls.py 에 관리자페이지를 url로 연결해준다.
+```python
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+```
+- admin 하위에 있는 것들은 `admin.site.urls`에 연결하겠다.
+- 받은 주소에 /admin 붙이면 장고 관리자 도구 사용할 수 있다.
+
+#### 관리자 계정 생성
+`python manage.py createsuperuser` 로 관리자 계정 생성
+
+
 
 
 ## 3. Static
