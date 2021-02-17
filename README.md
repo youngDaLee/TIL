@@ -11,6 +11,11 @@
 
 ### crawling
 - 크롤링 강의 들은 것, 하면서 겪은 어려움들 [crwaling](./crawling)에 정리
+
+### DevOps
+- [패스트캠퍼스 AWS/Docker 실전 클라우드 서비스](https://www.fastcampus.co.kr/dev_online_devops?utm_source=naver&amp%3Butm_medium=blog&amp%3Butm_campaign=dev_online_devops&amp%3Butm_content=organic_challenge)
+- 강의 들으며 정리.
+- git 쓰다 불편하면 [notion](https://www.notion.so/AWS-Docker-883e3a5886a449fcbcbd069c81366f8e)에 쓰기
 ### Django
 - [패스트캠퍼스 웹 개발 올인원 패키지](https://www.fastcampus.co.kr/dev_online_pyweb)
 - 강의를 들으며 [notion](https://www.notion.so/Django-efbccbcff85f4d1bb0d32299cdb49ca4)에 정리한다.
