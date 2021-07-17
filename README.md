@@ -30,3 +30,6 @@
 - ["OPERATING SYSTEM CONCEPTS 에센셜(홍릉과학출판사)"](http://www.hongpub.co.kr/shop/item.php?it_id=20181204081002) 책 뿌수기
 - 수업 내용 복습, 필요 시 K-MOOC 사이트에서 타 교수님 강의 들으며 OS개념 정복하기
 - [OperatingSystem](./OperatingSystem)에 정리
+
+### CleanCode
+- [파이썬 클린코드](http://www.yes24.com/Product/Goods/69064790) 책 정리
