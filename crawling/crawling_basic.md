@@ -16,7 +16,7 @@
 - Elements Tab : CSS Selector
 - Network Tab : Http 처리 과정
 - 단축키 : Ctrl + Shift + i   
-![img](/img/chrome_dev_crawl.PNG)
+![.img](/.img/chrome_dev_crawl.PNG)
 - 이 빨간 원 아이콘 클릭해서 수집 원하는 데이터 블록 선택하고 Copy함.
 
 

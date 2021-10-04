@@ -17,7 +17,7 @@ Development(개발) + Operations(운영) 의 합성어.
 ---
 ## Jira Confluence란?
 DevOps를 도입한다고 무조건 효율적인 것은 아니다. 다음과 같은 간단한 개발 프로세스를 지킬 필요가 있다.
-![img](../img/devops_01_1.png)
+![.img](../.img/devops_01_1.png)
 1. 코드 : 기획과 디자인이 충분히 논의를 거쳐 나온 업무 지시서를 바탕으로 개발 코드 작성한 뒤 병합하고 관리함.
 2. 빌드 : 빌드 프로세스를 통해 소스 컴파일. 각각의 언어에 따라 오류 없다면 컴파일 완료
 3. 테스트 : 다양한 테스트 도구 사용해서 코드 품질과 해당 동작 이상유무 검증.
@@ -55,7 +55,7 @@ Slack과 같은 업무를 위한 채팅이 생기긴 했지만 여전히 업무�
 
 ----
 ## AWS 와 Docker의 필요성 
-![aws](../img/devops_01_2.png)
+![aws](../.img/devops_01_2.png)
 ### Amazon Web Service
 - 전통적 IDC(International Data Conporation) -> 직접 서버를 구매하고 운영하는 방식
 - 점점 클라우드 서비스 중요도 증대
@@ -80,7 +80,7 @@ Slack과 같은 업무를 위한 채팅이 생기긴 했지만 여전히 업무�
 - 가격
 
 #### 종류
-![aws](../img/devops_01_4.png)
+![aws](../.img/devops_01_4.png)
 **Server**
 - EC2 :
 - Lambda : 
@@ -95,13 +95,13 @@ Slack과 같은 업무를 위한 채팅이 생기긴 했지만 여전히 업무�
 - DynamoDB :
 - RedShift :
 - AuroraDB :
-![aws](../img/devops_01_5.png)
+![aws](../.img/devops_01_5.png)
 **Mangement**
 - Cloud Watch : 
 - Kinesis :
 
 ### Doker
-![doker](../img/devops_01_3.png)
+![doker](../.img/devops_01_3.png)
 - 오픈소스 컨테이너 프로젝트로 만들어진 도커
 - 프로젝트 환경 스택(JAVA, MARIADB(RDS), MAVENm iBatis, SpringBoot, 스프링 시큐리티, S3(이미지))
 - 카카오로 로그인 + 오프랑니 후기 서비스 -> 도커 관리

@@ -13,7 +13,7 @@ Win32 에러 발생 시(윈도우10)
 `pip install pypiwin32`     
     
 cmd창에 scrapy 명령을 쳤을 때 다음과 같은 화면이 나오면 설치 성공   
-![scrapy](../img/scrapy_basic01.PNG)
+![scrapy](../.img/scrapy_basic01.PNG)
 ## Scrapy 프레임워크
 ### 장점
 - 이미 만들어진 **프레임워크** 이기 때문에 사용 편리
@@ -29,7 +29,7 @@ cmd창에 scrapy 명령을 쳤을 때 다음과 같은 화면이 나오면 설�
 - DB에 쉽게 저장 가능(pipeline 기능)
 
 ### 구조
-![scrapy](../img/scrapy_basic02.PNG)
+![scrapy](../.img/scrapy_basic02.PNG)
 - spiders가 직접 크롤링을 해 오는 역할. 핵심
 
 
@@ -41,7 +41,7 @@ cmd창에 scrapy 명령을 쳤을 때 다음과 같은 화면이 나오면 설�
 
 `scrapy genspider 스파이더명 크롤링할사이트`     
 그러면 스파이더에 이런 파일 생성됨     
-![scrapy](../img/scrapy_basic03.PNG)
+![scrapy](../.img/scrapy_basic03.PNG)
 - start_urls에 여러 사이트 추가해서 병렬처리도 가능. Scrapy의 장점.
   - allowed_domain에도 방문할 사이트 추가해야 함.
 
