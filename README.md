@@ -33,3 +33,8 @@
 
 ### CleanCode
 - [파이썬 클린코드](http://www.yes24.com/Product/Goods/69064790) 책 정리
+
+
+### ElasticSerch
+- [Udemy](https://www.udemy.com/course/elasticsearch-7-and-elastic-stack/) 강의 들으며 알게된 것 정리
+
