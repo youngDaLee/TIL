@@ -101,12 +101,26 @@ vm.max_map_count=262144
 
 ```
 
-## Elastic Overview
-
-
 ## Intro to HTTP nad RESTful API's
+- Method : GET, POST, PUT or DELETE
+- Protocol : What flavor of HTTP
+- Host : What web server you want to talk to
+- URL : What resource is being requested
+- Body : Extra data needed by the server
+- Headers : User-agent, countent-type ... 
 
 
 ## Elasticsearch Basics: Logical Concepts
+- Document : elasticsearch는 텍스트 뿐만 아니라 어떤 형태의 데이터도 저장 가능함. 데이터는 json 형태로 저장됨. 모든 도큐먼트는 Unique한 ID를 가짐.
+- Indices
+- 인덱스는 DB테이블로, 도큐먼트는 테이블의 row로 생각하면 됨.
+- 도큐먼트 데이터타입 정의하는 scheme도 인덱스에 속함
+- 단일 인덱스에는 하나의 도큐먼트만 허용
+- cluster = database
+- idices = tables
+- documents = row in tables
+
+## Term Frequency / Inverse Document Frequency (TF/IDF)
+
 
 
