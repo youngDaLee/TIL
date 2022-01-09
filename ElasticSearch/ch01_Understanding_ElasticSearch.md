@@ -1,5 +1,22 @@
 # Installing and Understanding ElasticSearch
 
+## ElasticSearch
+[출처-Elastic 가이드북](https://esbook.kimjmin.net/01-overview/1.1-elastic-stack/1.1.1-elasticsearch)
+- 오픈소스
+  - 루씬으로 만들어짐
+  - 루씬이 자바로 만들어졌기 때문에 ES도 자바로 코딩되어있음
+- 실시간 분석(real-time) 시스템
+  - ES 클러스터가 실행되고 있는 동안에는 계속 데이터가 입력(indexing)되고, 그와 동시에 실시간에 가까운 속도로 데이터 검색, 집계 가능
+- 전문(full text)검색 엔진
+  - indexing된 모든 데이터를 inverted file index구조로 저장해서 가곡된 텍스트를 검색. -> 이런 특성을 전문(full text)검색이라 함. 
+  - 내부적으로는 inverterd file index 구조로 데이터 전달하지만, 사용자 관점에서는 JSON 형태로 데이터 전달
+  - key-value 형식이 아닌 문서 기반이기 때문에 복합적인 정보를 포함하는 형식의 문서를 있는 그대로 저장 가능. -> indexing할 문서 가공하거나 다른 클라이언트 프로그램과 연동하기 간편함
+  - 모든 데이터를 JSON 형태로 가공할 필요 있음 -> Logstash에서 변환 지원
+- RESTful API
+  - ES는 REST API를 기본적으로 지원. 데이터 조회, 입력, 삭제를 http 프로토콜을 통해 Rest API로 처리
+- 멀티테넌시(multitenancy)
+  - ES 데이터는 인덱스(Index)라는 논리적 집합 단위로 구성되며 서로 다른 저장소에 분산되어 저장됨.
+
 ## Installing ElascitcSearch
 > Ubuntu에 엘라스틱서치 설치
 1. [ElasticSearch 공식 사이트](https://www.elastic.co/kr/downloads/)에서 우분투 서버에 다운로드
@@ -129,3 +146,27 @@ vm.max_map_count=262144
 - Term Frequency : 단어가 document에서 나온 회숫
 - Documnet Frequency : 단어가 모든 documnts에서 나온 횟수
 - Term Frequency/Document Frequency : document의 단어에 대해 관련성을 측정하는 것
+
+
+## Using Elasticsearch
+### Using Indices
+- RESTful API
+  - ElasticSearch 는 기본적으로 HTTP request와 JSON 데이터를 사용함.
+- Client API's
+- Analytic Tools
+
+## How Elasticsearch Scales
+- 문서들은 각 shard들로 해시됨
+- 각각의 샤드들은 클러스터 안의 다른 노드들임
+- 모든 샤드는 각각 자신의 Lucene 인덱스를 포함함
+
+### Primary and Replica Shard
+- 인덱스는 두 primary shard와 두 replica를가지고 있음.
+
+강의로 이해가 힘들어 [Elastic가이드북](https://esbook.kimjmin.net/03-cluster/3.2-index-and-shards) 참고하여 Primary샤드와 Replica 샤드에 대해 정리함
+- ES 데이터 단위 기본 개념
+  - Document : 단일 데이터 단위
+  - Index : document를 모아놓은 집합
+  - indices : 데이터 저장 단위
+  - shard : 인덱스가 분리되는 단위
+- index 구성 시 별도의 설정을 하지 않으면, 7.0 버전부터는 디폴트로 1개의 샤드로 인덱스가 구성됨.
