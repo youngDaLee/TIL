@@ -121,6 +121,11 @@ vm.max_map_count=262144
 - documents = row in tables
 
 ## Term Frequency / Inverse Document Frequency (TF/IDF)
+정보검색과 텍스트마이닝에서 이용하는 가중치. 어떤 단어가 특정 문서 내에서 얼마나 중요한 것인지 나타내는 통계적 수치. 문서의 핵심어를 추출하거나, 검색 엔진에서 검색 결과의 순위를 결정하거나, 문서들 사이의 비슷한 정도를 구하는 등의 용도로 사용.
+- 출처 : [위키백과](https://ko.wikipedia.org/wiki/Tf-idf)
 
-
-
+강의에서의 정의
+- TF-IDF = Term Frequency * Inverse Document Frequency
+- Term Frequency : 단어가 document에서 나온 회숫
+- Documnet Frequency : 단어가 모든 documnts에서 나온 횟수
+- Term Frequency/Document Frequency : document의 단어에 대해 관련성을 측정하는 것
