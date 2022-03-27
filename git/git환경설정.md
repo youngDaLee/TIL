@@ -60,7 +60,7 @@ Changes 에는 변경된 파일들(커밋을 기다리는 파일들)이 들어�
 
 저 파일들이 하나의 작업이라 한번에 올리도록 하겠습니다.
 ![git01](/.img/git/basic14.png)    
-Changes에는 파일이 없고(내가 한번에 다 올렸으니까)
+Changes에는 파일이 없고(내가 한번에 다 올렸으니까)     
 Staged Changes에 모든 파일들이 올라가 있는 걸 확인할 수 있음.      
 Staged Changes 바로 위에 Message (Ctrl+Enter to ... ) 에 커밋 메세지 쓰면 됨.      
 
