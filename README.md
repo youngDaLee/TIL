@@ -14,11 +14,11 @@
 ## Operating System
 - 
 # 2. Framework
-📙 Flask 
+📙 Flask     
 📙 Django    
 
 ## Flask
-- [파이썬과 웹 어플리케이션]
+- 
 ## Django
 - [Django 기초](Django/Django_basic.md)
 # 3. Data
