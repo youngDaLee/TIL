@@ -69,13 +69,13 @@ Dynamic Array는 size를 자동으로 resizing하는 Array. 기존 고정된 siz
 
 
 ## 면접 예상 질문
-**Q) 미리 예상한 것 보다 더 많은 수의 data를 저장하느라 Array size를 넘어서게 되었을 때 어떻게 해결 가능한지**
+### Q) 미리 예상한 것 보다 더 많은 수의 data를 저장하느라 Array size를 넘어서게 되었을 때 어떻게 해결 가능한지
 - 기존 사이즈보다 더 큰 array를 선언하여 데이터를 옮겨 할당한다. 모든 데이터를 옮겼으면 기존 array는 메모리에서 삭제한다.
 - 이렇게 배열의 크기를 조절하는 자료구조를 **Dynamic array**라 한다
 - size를 예측하기 쉽지 않으면 Array 대신 Linked List를 사용함으로서 데이터가 추가될 때 마다 메모리 공간을 할당받는 방식을 사용한다
 
 
-**Q) Dynamic Array를 Linked List와 비교하여 장단점을 설명**
+### Q) Dynamic Array를 Linked List와 비교하여 장단점을 설명
 - Linkied List와 비교했을 때 Dynamic Array의 장점은
   - 데이터 접근성과 할당이 O(1)로 굉장히 빠르다. 이는 index 접근 방식이 산술적 연산(배열 첫 data주소값)+(offset)으로 이루어져 있기 때문(random access)
   - Dynamic Array의 맨 뒤에 데이터를 추가 혹은 삭제하는 것이 상대적으로 빠름(O(1))
@@ -84,7 +84,7 @@ Dynamic Array는 size를 자동으로 resizing하는 Array. 기존 고정된 siz
   - resize 시 예상보다 현저히 낮은 performance 발생
   - resize에 많은 시간이 걸려 필요 이상 메모리 공간 할당됨. **사용하지 않는 메모리 공간 발생**
 
-**Q) Array vs Linked List를 비교해서 설명**
+### Q) Array vs Linked List를 비교해서 설명
 - Array는 메모리상에서 연속적으로 데이터를 저장하는 자료구조.
 - Linked List는 메모리상에서 연속적이지 않지만, 각각의 원소가 다음 원소의 메모리 주소 값을 저장해 놓음으로서 논리적 연속성을 유지함.
 - 따라서 각 Operation의 시간복잡도가 다르다.
@@ -110,17 +110,17 @@ Dynamic Array는 size를 자동으로 resizing하는 Array. 기존 고정된 siz
   - Array: (장점) 데이터 접근, append가 빠름 / (단점) 메모리 낭비 - 선언 시 fixed size를 설정하여 메모리 할당을 하기 때문에 데이터가 저장되어 있지 않아도 메모리를 차지함
   - Linked List: runtime 중에도 size를 늘리고 줄일 수 있음. initial size를 고민할 필요가 없고 필요한 만큼 메모리를 할당하여 메모리 낭비가 없음
 
-**Q) 어느 상황에서 Linkded List를 쓰는게 Array보다 나을까**
+### Q) 어느 상황에서 Linkded List를 쓰는게 Array보다 나을까
 - O(1)로 삽입/삭제를 자주 해야 할 때
 - 얼마만큼의 데이터가 들어올지 예측을 할 수 없을때
 - 조회작업을 별로 하지 않을때
 
-**Q) 어느 상황에 Array를 쓰는게 Linked List보다 나을까**
+### Q) 어느 상황에 Array를 쓰는게 Linked List보다 나을까
 - 조회작업 자주 할 때
 - Array를 선언할 당시 데이터 갯수 미리 알고 있을 때(정적 데이터)
 - 데이터를 반복문을 통해 빠르게 순회할 때
 - 메모리를 적게 쓴느게 중요한 상황일 때. Linked List보다는 Array가 메모리를 적게 차지하기 때문에 미리 들어올 데이터 양을 알고만 있으면 Array가 메모리를 더 효율적으로 사용 가능
 
-**Q) Array와 Linked List의 memory allocation은 언제 일어나며, 메모리의 어느 영역을 할당받는지**
+### Q) Array와 Linked List의 memory allocation은 언제 일어나며, 메모리의 어느 영역을 할당받는지
 - Array는 compile 단계에서 memory allcocation이 일어남. 이를 Static Memory Allocation이라 함. 이 경우 Stack memory 영역에 할당됨
 - Linked List의 경우 runtime 단계에서 새로운 node가 추가될 때 마다 memory allocation이 일어남. 이를 Dynamic Memory Allocation이라 부름 .Heap 메모리 영역에 할당됨
