@@ -8,9 +8,10 @@
 📙 Operating System     
 
 ## Algorithm
-- [Hash]([CS]Algorithm/Hash.md)
-- [Sort]([CS]Algorithm/Sort.md)
-- [Stack]([CS]Algorithm/Stack.md)
+- [Hash](Algorithm/Hash.md)
+- [Sort](Algorithm/Sort.md)
+- [Stack](Algorithm/Stack.md)
+- [Array](Algorithm/Array.md)
 ## Operating System
 - 
 # 2. Framework
