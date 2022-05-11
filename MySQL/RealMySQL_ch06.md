@@ -41,6 +41,50 @@
 
 
 ## 6.2 실행 계획 분석
+`EXPLAIN` : 쿼리 실행 계획 확인 가능
+- 확인하고 싶은 쿼리 문장 적으면 됨.
+
+```SQL
+EXPLAIN
+SELECT point_name
+FROM walkdb.walkingtrails
+WHERE region='은평구'
+LIMIT 10;
+```
+![explain](../.img/mysql/realmysql_ch06_1.PNG)
+- 표 형태로 된 1줄 이상의 결과 표시됨
+### 6.2.1 id 칼럼
+**단위(SELECT) 쿼리** : SELECT 키워드 단위로 구분한 것
+- !id 컬럼은 단위쿼리별로 값이 부과됨!
+
+- 하나의 SELECT 문장 안에서 여러 테이블 조인하면, 조인하는 테이블 개수만큼 실행계획 레코드 출력되지만, 같은 id가 부여됨.
+- SELECT 문장은 하나인데 여러 테이블 조인되는 경우는 id값증가하지 않고 같은 id 부여됨
+
+![id](../.img/mysql/realmysql_ch06_2.PNG)
+
+![id2](../.img/mysql/realmysql_ch06_3.PNG)
+
+### 6.2.2 select_type 칼럼
+각 SELECT 쿼리가 어떤 타입의 쿼리인지 표시.
+- SIMPLE
+  - UNION이나 서브쿼리 사용하지 않는 단순 SELECT인 경우
+  - 실행계획에서 select_type이 SIMPLE인 경우는 반드시 하나만 존재함
+- PRIMARY
+  - UNION이나 서브쿼리 포함된 SELECT쿼리 실행계획에서 가장 바깥쪽(OUTER)에 있는 단위쿼리
+  - 실행계획에서 select_type이 PRIMARY인 경우는 반드시 하나만 존재함
+- UNION
+  - 
+- DEPENDENT UNION
+- UNION RESULT
+- SUBQUERY
+- DEPENDENT SUBQUERY
+- DERIVED
+- UNCACHEABLE SUBQUERY
+- UNCACHEABLE UNION
+### 6.2.3 table 칼럼
+
+### 6.2.4 type 칼럼
+
 
 
 ## 6.3 MySQL의 주요 처리 방식
@@ -53,3 +97,7 @@
 - [데이터베이스 옵티마이저에 대하여](https://coding-factory.tistory.com/743)
 - [Optimize Table & Analyze Table](https://myinfrabox.tistory.com/145)
 - [InnoDB에 대하여(MyISAM과 차이점)](https://sarc.io/index.php/mariadb/346-innodb-myisam)
+
+## QnA
+### Q) select_type 컬럼에서 SIMPLE은 왜 하나만 존재함?
+
