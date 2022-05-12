@@ -191,7 +191,7 @@ MySQL 각 테이블 레코드를 어떤 방식으로 읽었는지를 의미. -> 
 레코드 건수. 반환되는 레코드 건수가 아닌 쿼리를 처리하기 위해 얼마나 많은 레코드를 디스크로부터 읽고 체크해야 하는지 의미함. 오차 심함
 - 작으면 작을수록 좋음.
 
-### 6.2.10 Extra
+### 6.2.10 Extra -> 여러 번 다시 보면서 질문 정리하기
 쿼리 실행계획에서 성능에 관련된 중요한 내용이 Extra컬럼에 표시됨
 - const row not found
   - const방식으로 읽었지만 실제로 해당 테이블에 레코드가 1건도 존재하지 않을 때
@@ -235,22 +235,45 @@ MySQL 각 테이블 레코드를 어떤 방식으로 읽었는지를 의미. -> 
   - ORDER BY 처리가 인덱스를 사용 못할 때
 - Using index(커버링 인덱스)
   - 데이터 파일 전혀 읽지 않고 인덱스만 읽어서 쿼리 처리 가능할 때
+  - 접근 방식이 eq_ref, ref, range, index_merge, index 등과 같이 인덱스 사용하는 실행계획에서는 모두 Using Index 표시 가능
 - Using index for group-by
-  - 
+  - GROUP BY 연산 처리 위해 MySQL은 그룹핑 기준 칼럼으로 정렬 수행 -> 정렬된 결과 그룹핑하는 고부하작업 수행. 
+  - GROUP BY 처리가 인덱스(B-TREE 한해) 이용하면 정렬된 인덱스 컬럼을 순서대로 읽으면서 그룹핑 처리.
+    - 레코드 정렬 없이 인덱스만 읽으면 되기 때문에 효율적
 - Using join buffer
+  - 
 - Using sort_union(...), Using union(...), Using intersect(...)
+  - 쿼리가 index_merge 방식으로 실행되면, 2개 이상 인덱스가 동시 사용됨. -> EXTRA에서 두 인덱스 결과 어떻게 병합했는지 아래 3가지로 설명
+  - Using intersect(...)
+    - 각각의 인덱스를 사용할 수 있는 조건이 AND로 연결된경우, 각 처리 결과에서 교집합을 추출해내는 작업을 수행함
+  - Using union(...)
+    - 각각의 인덱스를 사용할 수 있는 조건이 OR로 연결된경우, 각 처리 결과에서 합집합을 추출해내는 작업을 수행함
+  - Using sort_union(...)
+    - Using union과 같은 작업을 수행하지만, Using union으로 처리 불가능한 경우(OR로 연결된 대량은 range 조건)
+    - PK만 먼저 읽어 정렬, 병합 후 레코드를 읽어 반환
+    - using union과 using sort_union은 정렬알고리즘의 싱글패스 정렬알고리즘/투패스 정렬알고리즘 차이와 같음
 - Using temporary
+  - MySQL 쿼리 처리하는 동안 중간 결과를 임시테이블에 저장.
+  - Using temporary : 임시테이블 사용한다~(GROUP BY ... )
+    - => 그 FROM 절 내 UNION연산같은 경우도 Using temporary 나오는지?
 - Using where
+  - MySQL은 내부적으로 크게 MySQL 엔진/스토리지 엔진 레이어로 나뉨.
+  - MySQL엔진은 스토리지 엔진으로부터 받은 레코드를 가공or연산하는 작업을 수행
+  - MySQL엔진레이어에서 별도의 가공 후 필터링 작업 처리 시 Using WHERE 코멘트 표시됨
 - Using where with pushed condition
 
 ### 6.2.11 EXPLAIN EXTENDED(Filtered 컬럼)
 필터링이 얼마나 효율적으로 실행됐는지 알려주기 위해 Filtered 컬럼 추가. 필터링되어 제거된 레코드 제외 최종적으로 레코드가 얼마나 남았는지 퍼센트(%)로 알려줌
+
 ### 6.2.12 EXPLAIN EXTENDED(추가 옵티마이저 정보)
 분석된 파스트리 재조합하여 쿼리 문장과 비슷한 순서대로 나열해 보여주는것
+
 ### 6.2.13 EXPLAIN EXTENDED(Partitions 컬럼)
 파티션 테이블 실행 계획 정보 확인. 쿼리를 사용하기 위해 테이블 파티션 중 어떤 파티션 사용했는지 정보 확인함.   
 파티션 프루닝(Partition pruning) : 파티션 여러개인 테이블에서 불필요한 파티션 빼고 쿼리 수행하기 위해 접근해야 할 것으로 판단되는 테이블만 골라내는 과정
 - `EXPLAIN PARTITIONS` 명령으로 참조한 파티션 확인 간으
+
+
 ## 6.3 MySQL의 주요 처리 방식
 
 
