@@ -236,12 +236,28 @@ MySQL 각 테이블 레코드를 어떤 방식으로 읽었는지를 의미. -> 
 - Using index(커버링 인덱스)
   - 데이터 파일 전혀 읽지 않고 인덱스만 읽어서 쿼리 처리 가능할 때
 - Using index for group-by
-  - 
+  - GROUP BY처리가 인덱스를 이용할 때
+  - 루스 인덱스 스캔 -> 필요한 부분만 듬성듬성읽음
+  - WHERE절에서 사용하는 인덱스에 의해서도 사용 여부 영향받음
 - Using join buffer
-- Using sort_union(...), Using union(...), Using intersect(...)
+  - 드리븐 테이블에 인덱스가 없으면 매번 풀스캔 해야 함. -> 비효율적...
+  - 이를 보완하가 위해 드라이빙 테이블에서 읽은 레코드를 임시공간(조인 버퍼)에 보관해둠.
+  - 조인 버퍼가 사용될 때 Using join buffer 표시됨
+- Using sort_union(...)
+  - 각각의 인덱스를 사용할 수 있는 조건이 and로 연결
+- Using union(...)
+  - 각각의 인덱스를 사용할 수 있는 조건이 OR로 연결
+- Using intersect(...)
+  - Using union과 같은 작업 수행하지만 Using union으로 처리 불가능(OR로 연결된 대량의 range 조건들)
+  - 프라이머리 키만 먼저 읽어서 정렬, 병합 후 레코드 읽어 반환 가능
 - Using temporary
+  - MySQL 처리 중 임시테이블 사용
+  - 임시테이블이 메모리에 저장되었는지 디스크에 저장되었는지는 알 수 없음
 - Using where
+  - MySQL 엔진 레이어에서 별도 가공 해서 필터링 작업 한 경우
 - Using where with pushed condition
+  - coudition push down 적용됨
+  - 스토리지 엔진의 비효율이 개선도니 형태
 
 ### 6.2.11 EXPLAIN EXTENDED(Filtered 컬럼)
 필터링이 얼마나 효율적으로 실행됐는지 알려주기 위해 Filtered 컬럼 추가. 필터링되어 제거된 레코드 제외 최종적으로 레코드가 얼마나 남았는지 퍼센트(%)로 알려줌
@@ -442,14 +458,93 @@ EXTRA가 Using temporary 표시되면 임시테이블 사용하는거임.
   - MySQL 실행계획에서는 INNER JOIN인지 OUTER JOIN인지 알려주지 않아서 OUTER을 의도한 쿼리가 INNER로 처리되진 않는지 살펴야 함
   - 옵티마이저가 OUTER를 INNER로 변형할 수 있기 때문에 조건을 ON절에 꼭 명시하자. 
 - NATURAL JOIN
-  - 
+  - 컬럼의 이름이 동일한 컬럼을 모두 조인
+  - `INNER JOIN salaries s ON s.emp_no=e.emp_no` 와 같음
+  - INNER JOIN 조건 명시안해도 되는 편리함 -> 각 테이블의 컬럼 이름에 의해 쿼리가 자동으로 변경되는 문제.
+  - 유지보수 역효과...
 - CROCSS JOIN(FULL JOIN, CARTESIAN JOIN(카데시안 조인))
   - 조인 조건 없이 2개 테이블에서 모든 레코드 조합을 결과로 가져옴
   - 레코드가 1~2건으로 많이 않을때면 문제 없는데, 레코드 건수 많을수록 기하급수적으로 늘어나 MySQL 서버 죽일 수 있음
   - 조인 테이블 많아지고 조인 조건 복잡해질수록 의도치 않은 카데시안 조인 발생 가능성 크다.
   - 이너조인과 문법으로 구분되지 않음. 조건이 적절하면 이너조인으로, 그렇지 않으면 카데시안 조인이 됨.
-## 6.4 실행 계획 분석 시 주의사항
 
+
+**Single-sweep multi join**
+- 네스티드-루프 조인을 single-swepp multi join 이라고도 함.
+- 조인에 참여하는 테이블 개수 만큼 반복 루프가 중첩됨
+- 반복 루프를 돌며 레코드 단위로 모든 조인 대상 테이블을 차례대로 읽는 방식.
+- 드라이빙 테이블을 읽은 순서대로 레코드가 정렬되어 반환함.
+- 조인에서 드리븐 테이블들은 단순히 드라이빙 테이블의 레코드를 읽는 순서대로 검색만 함.
+
+
+**조인 버퍼를 이용한 조인*Using join buffer**
+- 드라이븐은 한번에 쭉 읽고 드리븐은 여러번 읽게 됨.
+- 드리븐의 풀테이블 스캔을 피할 수 없으면, 옵티마이저가 드라이빙 테이블에서 읽은 레코드를 메모리에 캐시한 후 드리븐 테이블과 메모리를 조인하는 형식으로 처리함. -> 이 때 사용되는 메모리 캐시를 조인 버퍼(Join buffer)라 함
+- 조인 완료되면 조인버퍼 해제됨
+
+**조인 관련 주의사항**
+- 조인 실행 결과 정렬 순서
+- INNER JOIN, OUTER JOIN 선택
+
+
+
+## 6.4 실행 계획 분석 시 주의사항
+실행 계획의 컬럼에 표시되는 값 중 주의해서 확인해야 하는 사항
+### 6.4.1 Select_type 컬럼 주의 대상
+- DERIVED
+  - FROM 절에 사용된 서브쿼리로부터 발생한 임시테이블.
+  - 임시테이블이 메모리에 저장된 경우는 성능에 영향 미치지 않아 괜찮지만, **디스크**에 저장된 경우 크케 성능에 영향 미침
+- UNCACHEABLE SUBQUERY
+  - FROM절 이외에서 사용하는 서브쿼리는 최대한 캐싱해서 재사용 유도함.
+  - 사용자 변수나 일부 함수 사용된 경우 캐시 사용 불가능
+  - 사용자 변수 제거하거나 다른 함수 대체해서 사용 가능한지 검토 필요
+- DEPENDENT SUBQUERY
+  - FROM절 이외의 부분에서 사용하는 서브쿼리가 자체적으로 실행되지 못하고 외부 쿼리에서 값을 받아 실행하는 경우
+  - 서브쿼리 외부에 의존적이기 때문에 전체적으로 느리게 만듬
+  - 외부쿼리 의존도 제거 필요
+
+### 6.4.2 Type 컬럼 주의 대상
+- ALL
+  - 풀 테이블 스캔
+- index
+  - 인덱스 풀 스캔
+
+둘 다 대상 차이만 있고 전체 레코드 대상 작업방식. OLTP 환경에 적합하지 않음.
+- 새로운 인덱스 추가하거나 쿼리 요건 변경해서 해결 필요
+
+### 6.4.3 Key 컬럼 주의 대상
+- 쿼리가 인덱스 사용 못할때 key에 아무런 표시 x. -> 적절한 인덱스 추가하거나 WHERE절 조건 변경
+
+### 6.4.4 Rows 컬럼 주의 대상
+- 실제 레코드보다 Rows가 훨씬 큰 경우, 쿼리가 인덱스를 정상적으로 사용하고 있는지, 인덱스가 작업 범위를 좁혀줄 수 있는 컬럼으로 구성되어 있는지 확인 필요
+  - 효율적이지 않으면 인덱스 재생성 or 쿼리 요건 변경 필요
+- Limit 제한은 Rows 컬럼 고려 대상에서 제외됨. LIMIT 1 이더라도 Rows는 훨씬 큰 수치 나오고, 성능상 아무 문제 없는 최적화된 쿼리일 수 있음
+
+### 6.4.5 Extra 컬럼 주의 대상
+중요한 내용 많이 표시됨. 기억했다가 자세히 검토 필요
+#### 쿼리가 요건을 제대로 반영하고 있는지 확인해야 하는 경우
+쿼리가 요건 제대로 반영됐거나 버그 가능성 없는지 확인 필요
+- Full scan on NULL key
+- Impossible HAVING(MySQL 5.1~)
+- Impossible WHERE(MySQL 5.1~)
+- Impossible WHERE noticed after reading const tables
+- No matching min/max row(MySQL 5.1~)
+- No matching row in const table(MySQL 5.1~)
+- Unique row not found(MySQL 5.1~)
+
+#### 쿼리의 실행 계획인 좋지 않은 경우
+쿼리를 더 최적화 할 수 있는지 검토
+- Range checked for each record(index map: N)
+- Using filesort
+- Using join buffer(MySQL 5.1~)
+- Usinhg temporary
+- Using where
+
+#### 쿼리의 실행계획이 좋은 경우
+최적화되어 처리되고 있는 지표. 특히 두번째 Using index는 커버링 인덱스로 처리되고 있음을 알려줌->MySQL 최고의 성능
+- Distinct
+- Using index
+- Using index for group-by
 
 ## 읽기 좋은 블로그
 - [데이터베이스 옵티마이저에 대하여](https://coding-factory.tistory.com/743)
@@ -483,3 +578,9 @@ WHERE e.emp_no=de.emp_no AND de.dept.no='d005'
 
 
 ### Q) 임시테이블에서 유니크 인덱스가 있는 임시테이블이 그렇지 않은 테이블보다 처리 성능이 느리다 했는데, 인덱스가 있는 테이블은 메모리가 커도 성능이 좋은 것이 아닌지. 임시테이블이라 다른 것인지.
+
+
+### Q) 조인 버퍼를 사용하는 조인이 잘 이해가 안됨. 조인에 필요한 컬럼만 따로 조인 버퍼에 저장한 뒤, 그 테이블을 드리븐 테이블과 조인하는 건지
+
+### Q) 만약 조인 버퍼에 저장될 드라이빙 테이블이 조인 버퍼보다 크면 어떻게 되는지
+
