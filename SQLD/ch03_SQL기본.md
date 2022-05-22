@@ -236,7 +236,16 @@ CEIL/CELING VS FLOOR
   - `FLOOR(-38.123)` => -39
 
 ### 변환형 함수
-암시적 데이터 유형 변환(문자가 숫자로 변형됨)
+- 명시적(Explicit) 데이터 유형 변환 : 데이터 변환형 함수로 데이터 유형 변환하도록 명시해주는 경우
+- 암시적(implicit) 데이터 유형 변환 : DB가 자동으로 데이터 유형 변환하여 계산하는경우
+
+### CASE 표현
+```SQL
+CASE
+    EXPR WHEN COMPARSINO_EXPR THEN RETURN_EXPR
+    ELSE 표현
+END
+```
 
 ### NULL 관련 함수
 - `NVL(표현식1, 표현식2)` `ISNULL(표현식1, 표현식2)` : 표현식 1이 아니면 표현식 2값 출력 
@@ -245,9 +254,102 @@ CEIL/CELING VS FLOOR
 
 `IS NULL` `IS NOT NULL` 은 NULL 관련 함수가 아닌 연산자임
 
+### 다중행 함수의 종류
+#### 집계함수
+`SELECT`, `HAVING`, `ORDER BY`절에 사용가능
+- `COUNT(*)` : NULL값 포함한 행의 수
+- `SUM()` : NULL값 제외한 합계
+- `AVG()` : NULL값 제외한 평균
+- `MAX()` `MIN()` : 최대/최소값 출력
 
 ## Group By, Having절
+- SELECT 절에 정의되지 않은 컬럼은 사용불가
+- 집계함수 WHERE절에 올 수 없음. GROUPBY 통해 소그룹멸 기준 정한 후 SELECT절에서 집계함수 사용
+### GROUP BY
+- ALIAS명 사용 불가
+- WHERE절은 전체 데이터를 GROUP으로 나누기 전 행들을 미리 제거
+
+### HAVING
+- 일반적으로 GROUP BY 뒤에 위치
+- WHRER절에서는 집계함수 사용 불가능하지만 HAING절은 집계함수 사용 가능
+- WHERE절로 행 거르고 -> GROUP BY에서 그룹으로 묶어진 결과를 -> HAVING절에서 판단해서 리턴
+
+```SQL
+SELECT POSTION 포지션, ROUND(AVG(HEIGHT), 2) 평균 키
+FROM PLAYER
+GROUP BY POSITION HAVING AVG(HEIGHT) >= 180;
+
+-- 실행 결과
+포지션  평균키
+------ --------
+GK      180.26
+DF      180.21
+```
+- 평균 키 180 넘는 POSITON만 출력됨
 
 ## Order By절
+- SLECT절에 정의되지 않은 컬럼 사용 가능
+- 기본적인 정렬 순서는 오름차순(`ASC`) <-> 내림차순(`DESC`)
+  - 숫자 오름차순 : 작은 숫자부터 출력
+  - 날짜 오름차순 : 날짜 빠른 값 먼저 출력
+- ORACLE : NULL값이 가장 큰 값으로 간주. 오름차순이면 NULL이 가장 마지막
+- SQL SERVER : NULL값이 가장 작은값. 오름차순이면 NULL이 가장 먼저
+- 컬럼명, ALIAS명, 컬럼 순서 혼용 사용 가능
+
+### SELECT 문장 실행 순서
+`FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `SELECT` -> `ORDER BY`
+
+### TOP N 쿼리
+#### ROWNUM
+- WHERE절 행의 개수 제한
+
+```SQL
+WHERE ROWNUM = 1;
+
+WHERE ROWNUM <= N;
+WHERE ROWNUM < N;
+```
+### TOP()
+- SQL SERVER에서 행 개수 제한
+
+```SQL
+SELECT TOP(2) ~ FROM EMP ORDER BY SAL
+```
+- 1위 한명, 공동 2위 2명있을 때 with ties 조건 추가하면 3건 출력, with ties 없으면 2건 출력
 
 ## JOIN
+두 개 이상의 테이블에서 컬럼 가져오는 방법. 
+
+### EQUI JOIN(등가 조인)
+두 개 테이블 간 컬럼 값들 정확히 힐치하는 경우 사용하는 방법. 대부분 PK<->FK 관계 기반으로 함
+
+```SQL
+WHERE PLAYER.TEAM_ID = TEAM.TEAM_ID AND PLAYER.POSITION = 'GK';
+
+FROM PLAYER INNER JOIN TEAM ON PLAYER.TEAM_ID=TEAM.TEAM_ID
+WHERE PLAYER.POSITION = 'GK';
+```
+
+
+### NON EQUI JOIN(비등가 조인)
+두 테이블 간 값들 정확하게 일치하지 않는 경우. `=` 연산자가 아닌 다른 연산자(`BETWEEN`, `>`, `>=`, `<`, `<=`) 연산자 사용해서 JOIN 수행
+
+```SQL
+WHERE E.SAL BETWEEN S.LOSAL AND S.HISAL;
+```
+
+### 3개 이상 TABLE JOIN
+```SQL
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, T.REGION_NAME 연고지, T.TEAM_NAME 팀명, S.STADIUM_NAME 구장명
+FROM PLAYER P, TEAM T, STADIUM S 
+WHERE P.TEAM_ID = T.TEAM_ID AND T.STADIUM_ID = S.STADIUM_ID
+ORDER BY 선수명;
+```
+
+```SQL
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, T.REGION_NAME 연고지, T.TEAM_NAME 팀명, S.STADIUM_NAME 구장명
+FROM PLAYER P
+    INNER JOIN TEAM T ON P.TEAM_ID = T.TEAM_ID 
+    INNER JOIN STADIUM S ON T.STADIUM_ID = S.STADIUM_ID 
+ORDER BY 선수명;
+```
