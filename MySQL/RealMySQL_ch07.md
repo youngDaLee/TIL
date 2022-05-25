@@ -453,10 +453,98 @@ SELECT * FROM salaries WHERE salary*100 > 15000;
 - 컬럼의 **데이터 타입**과 비교되는 값의 타입이 달라도 인덱스 활용 못함(index 레인지 스캔 불가능 -> 인덱스 풀스캔 하게 됨)
 
 
-**WHERE 절의 인덱스 사용**
+**WHERE 절의 인덱스 사용** -> 이해 못함...
 - 범위 제한 조건
   - 동등 비교 조건, IN으로 구성된 조건이 인덱스 컬럼과 얼마나 좌측부터 일치하는가에 따라 달라짐
 - 체크 조건
 
 
 **GROUP BY 절의 인덱스 사용**
+- GROUP BY에 명시된 컬럼 순서가 인덱스를구성하는 컬럼의 순서와 다르면 인덱스 사용 불가능
+- 인덱스에 명시된 컬럼 중 뒷쪽 컬럼은 GROUP BY에 없어도 되지만, 앞쪽이 없으면 인덱스 사용 불가능
+- WHERE 와 달리 GROUP BY에 명시된 컬럼이 하나라도 인덱스에 없으면 사용 불가능
+```SQL
+INDEX ip_addr, domain_name, port_no;
+
+SELECT *
+FROM table_
+GROUP BY port_no, ip_addr, domain_name;
+>>> x : 순서
+
+SELECT *
+FROM table_
+GROUP BY ip_addr, domain_name;
+>>> o
+
+SELECT *
+FROM table_
+GROUP BY port_no;
+>>> x : 앞쪽 인덱스 없음
+
+SELECT *
+FROM table_
+GROUP BY ip_addr, domain_name, port_no;
+>>> o
+
+SELECT *
+FROM table_
+GROUP BY ip_addr, domain_name, port_no, banner;
+>>> x : 인덱스 아닌 컬럼(banner)
+```
+
+- WHERE 조건절에 앞선 컬럼이 동등비교조건으로 사용되면, GROUP BY 절에서 앞선 컬럼이 빠져도 인덱스 사용 가능 할 때도 있음
+
+```SQL
+SELECT *
+FROM table_
+WHERE ip_addr='1.1.1.1'
+GROUP BY domain_name, port_no;
+```
+
+**ORDER BY 절의 인덱스 사용**
+- GROUP BY와 거의 동일
+- 정렬되는 각 컬럼의 오름차순(ASC) 및 내림차수(DESC) 옵션이 인덱스와 같거나 정반대여야 함
+- MySQL 인덱스는 모든컬럼이 오름차순
+  - ORDER BY가 모두 오름차순이거나 내림차순일때만 인덱스 사용 가능
+
+
+```SQL
+INDEX ip_addr, domain_name, port_no;
+
+SELECT *
+FROM table_
+ORDER BY port_no, ip_addr, domain_name;
+>>> x : 순서
+
+SELECT *
+FROM table_
+ORDER BY ip_addr, domain_name;
+>>> o
+
+SELECT *
+FROM table_
+ORDER BY port_no;
+>>> x : 앞쪽 인덱스 없음
+
+SELECT *
+FROM table_
+ORDER BY ip_addr ASC, domain_name ASC, port_no ASC;
+>>> o
+
+SELECT *
+FROM table_
+ORDER BY ip_addr, domain_name, port_no, banner;
+>>> x : 인덱스 아닌 컬럼(banner)
+
+SELECT *
+FROM table_
+ORDER BY ip_addr DESC, domain_name ASC, port_no, ASC;
+>>> x
+
+SELECT *
+FROM table_
+ORDER BY ip_addr DESC, domain_name DESC, port_no, DESC;
+>>> o
+```
+
+**WHERE 조건과 ORDER BY(또는 GROUP BY)절의 인덱스 사용**
