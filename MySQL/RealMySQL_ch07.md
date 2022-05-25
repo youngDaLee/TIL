@@ -183,10 +183,261 @@ SELECT * FROM domain_table WHERE source_domain LIKE '%test.net' ESCAPE '%';
 ```
 
 **BETWEEN 연산자**
+- 크거나 같다와 작거나 같다가 합쳐진 연산자.
+- 선형으로 인덱스를 검색
 
 
 **IN 연산자**
+- 동등비교 연산자와 비슷함. 동등비교를 여러 번 수행
+  - 여러 개 값이 비교되지만 전부 동등비교로 수행되어 일반적으로 빠름
+  - MySQL에서는 비효율적인 경우 존재: IN 연산자에 상수값을 입력값으로 전달하는 경우
+- 여러 컬럼 인덱스에서 Between 보다 효율적인 경우 존재함
 
 
 ### 7.3.3 MySQL 내장 함수
 
+**NULL값 비교 및 대체(IFNULL, ISNULL)**
+- IFNULL : 컬럼, 표현식 값이 NULL이면 다른 값으로 대체
+- ISNULL : NULL이면 1, 아니면 0
+
+```SQL
+SELECT IFNULL(NULL, 'aaa');
+>>> 'aaa'
+
+SELECT ISNULL(NULL);
+>>> 1
+
+SELECT ISNULL('aaa');
+>>> 0
+```
+
+
+**현재 시각 조회(NOW, SYSDATE)**
+- NOW : 하나의 SQL에서 모든 NOW 함수는 같은 값을 가짐
+- SYSDATE : 하나의 SQL 내에서도 호출되는 시점에 따라 결과 값이 다름
+
+```SQL
+SELECT NOW(), SLEEP(2), NOW();
+>>> 2022-05-25 21:55:05     0       2022-05-25 21:55:05
+
+SELECT sysdate(), SLEEP(2), sysdate();
+>>> 2022-05-25 21:55:12     0       2022-05-25 21:56:14
+```
+- SYSDATE()의 잠재적인 문제점
+  - SYSDATE()가 사용된 SQL문은 복제가 구축된 Mysql 슬레이브에서 안정적으로 복제되지 못함
+  - SYSDATE()함수와 비교되는 컬럼은 인덱스를 효율적으로 사용하지 못함
+
+```SQL
+SELECT * FROM domain_table WHERE modify_dtime > NOW();
+>>> Extra절에 Using index
+
+SELECT * FROM domain_table WHERE modify_dtime > SYSDATE();
+>>> Extra 절에 Using Index 없음
+```
+- 꼭 필요할 때가 아니면 SYSDATE() 사용하지 않는 것이 좋음
+  - 이미 SYSDATE()함수 쓰고 있으면 설정파일에  `sysdate-is-now` 설정 추가하여 SYSDATE를 NOW처럼 사용
+
+
+**날짜와 시간의 포맷(DATE_FORMAT, STR_TO_DATE)**
+```SQL
+SELECT DATE_FORMAT(NOW(), '%Y-%m-%d') AS curr_dt;
+>>> str('2022-05-25')
+
+SELECT STR_TO_DATE('2022-05-25', '%Y-%m-%d')
+>>> date('2022-05-25')
+```
+
+
+**날짜와 시간의 연산(DATE_ADD, DATE_SUB)**
+```SQL
+SELECT DATE_ADD(NOW(), INTERVAL 1 DAY) AS tomorrow;
+>>> '2022-05-26 22:14:12'
+
+SELECT DATE_ADD(NOW(), INTERVAL 1 DAY) AS yesterday;
+>>> '2022-05-24 22:14:12'
+```
+- YEAR : 년도
+- MONTH : 월
+- DAY : 일
+- HOUR : 시
+- MINUTE : 분
+- SECOND : 초
+- QUARTER : 분기
+- WEEK : 주
+
+
+**타임 스탬프 연산(UNIX_TIMESTAMP, FROM_UNIXTIME)**   
+- UNIX_TIMESTAMP : 경과된 초 반환(4byte 내 범위 표현 가능)
+- FROM_TIMESTAMP : 인자로 받은 TIMESTAMP를 DATETIME으로 변환
+```SQL
+SELECT UNIX_TIMESTAMP('2022-01-01');
+
+SELECT FROM_UNIXTIME(UNIX_TIMESTAMP('2022-01-01'));
+>>> '2022-01-01'
+```
+
+
+**문자열 처리(RPAD, LPAD / RTRIM, LTRIM, TRIM)**
+- RPAD, LPAD : 문자의 우측/좌측에 문자를 원하는 만큼 덧붙여서 저장
+```SQL
+SELECT RPAD('HAHA', 10, '_')
+>>> 'HAHA__________'
+
+SELECT LPAD('HOHO', 3, '0')
+>>>
+```
+
+- RTRIM, LTRIM, TRIM : 우측/좌측/양측 공백문자 제거
+
+```SQL
+SELECT LTRIM('          GG'); 
+>>> 'GG'
+SELECT RTRIM(' GG                '); 
+>>> ' GG'
+SELECT TRIM(' GG                '); 
+>>> 'GG'
+```
+
+**문자열 결합(CONCAT)**
+```SQL
+SELECT CONCAT('HAHA', 'HOHO', 'HEHE');
+>>> 'HAHAHOHOHEHE'
+SELECT CONCAT('HAHA', 'HOHO', 2);
+>>> 'HAHAHOHO2'
+SELECT CONCAT_WS(',', 'HAHA', 'HOHO');
+>>> 'HAHA,HOHO'
+```
+
+**GROUP BY 문자열 결합(GROUP_CONCAT)**
+```SQL
+SELECT GROUP_CONCAT(cve_id) FROM ~~;
+SELECT GROUP_CONCAT(cve_id SEPERATOR '|') FROM ~~;
+SELECT GROUP_CONCAT(cve_id ORDER BY ip_addr DESC) FROM ~~;
+SELECT GROUP_CONCAT(DISTINCT cve_id ORDER BY ip_addr DESC) FROM ~~;
+```
+- 지정한 컬럼 값들을 연결하기 위해 메모리 버퍼 사용 -> 시스템 변수에 지정된 크기를 초과하면 경고 메세지(warning) 발생
+
+**값의 비교와 대체(CASE WHEN .. THEN .. END)**    
+switch 구문과 같은 역할.
+- CASE로 시작하고 END로 끝나야 하며, WHEN .. THEN .. 은 반복 가능
+```SQL
+SELECT point_name,
+	CASE region WHEN '노원구도봉구' THEN '노원구'
+				WHEN '광진구중랑구' THEN '광진구'
+				ELSE '그외'
+	END AS region
+FROM walkingtrails;
+
+
+SELECT point_name,
+	CASE region WHEN region LIKE '노원구%' THEN '노원구'
+				WHEN  region LIKE '광진구%' THEN '광진구'
+				ELSE '그외'
+	END AS region
+FROM walkingtrails
+ORDER BY region;
+```
+
+**타입의 변환(CAST, CONVERT)**
+```SQL
+SELECT CAST('1234' AS SIGNED INTEGER);
+>>> 1234
+```
+
+```SQL
+SELECT CONVERT('ABC' USING 'utf-8')
+```
+
+**이진값과 16진수 문자열 변환(HEX, UNHEX)**
+
+
+**암호화 및 해시 함수(MD5, SHA)**
+- 비대칭형 암호화 알고리즘
+- 문자열을 각각 지정된 비트수에 맞춰 해시값으로 만들어내는 함수
+- SHA : SHA-1 암호화 알고리즘 사용해 160비트(20byte) 해시값 반환
+- MD5 : Message Digest 알고리즘 사용해 128비트(16byte) 해시값 반환
+```SQL
+SELECT MD5('abc');
+>>> 900150983cd24fb0d6963f7d28e17f72
+
+SELECT SHA('abc');
+>>> a9993e364706816aba3e25717850c26c9cd0d89d
+```
+- 중복 가능성이 매우 낮아 인덱싱 용도로 사용됨
+
+
+**처리 대기(SLEEP)**
+
+
+**벤치마크(BENCHMARK)**
+- 디버깅, 함수 성능 테스트용으로 유용
+- BENCHMARK(반복해서 수행할 횟수, 반복해서 실행할 표현식)
+- 성능 확인에 사용됨
+
+```SQL
+SELECT BENCHMARK(1000000, MD5('ABC'));
+```
+
+**IP 주소 변환(INET_ATON, INET_NTOA)**
+- INET_ATON : 문자열로 구성도니 IP주소를 정수형으로 변환
+- INET_NTOA : 정수형 IP 주소를 사람이 읽을 수 있는 형태 문자열('.'으로 구분된 IP)로 변환
+
+```SQL
+SELECT INET_ATON('127.0.0.1');
+>>> 2130706433
+
+SELECT INET_NTOA(2130706433);
+>>> '127.0.0.1'
+```
+
+**MySQL 전용 암호화(PASSWORD, OLD_PASSWORD)**
+- 일반 사용자가 사용해서는 안되는 함수
+- 비밀번호 관리 위한 함수였지만, 암호화 하는 용도로 적합하지 않음 -> MD5, SHA 함수 사용 권장
+- 이전 버전과 호환 안됨
+- 4.0 버전에서 PASSWORD 사용했으면, 4.1 이상에서 PASSWORD 사용하는 부분을 OLD_PASSWORD로 변경해야 함. (혹은 시스템 설정 변수 파일 my.cnf에 old_password=1 설정)
+
+**VALUES()**
+- INSERT INTO ... ON DUPLICATE KEY UPDATE ... 형태의 SQL문장에서만 사용 가능
+- PK, UK 중복되는 경우에는 UPDATE, 그 외의 경우 INSERT 수행
+- 해당 컬럼에 INSERT 하려 했던 값을 참조하는 것이 가능함
+
+```SQL
+INSERT INTO tab_statistics (member_id, visit_count)
+SELECT member_id, COUNT(*) as cnt
+    FROM tab_accesslog
+    GROUP BY member_id
+ON DUPLICATE KEY
+    UPDATE visit_count = visit_count + VALUES(visit_count);
+```
+- PK(member_id) 존재 시 cnt를 visit_count에 더함
+
+**COUNT()**
+- ORDER BY 구문이나 LEFT JOIN과 같은 레코드 건수를 가져오는 것과 무관 자겁을 포함함.
+- 인덱스 제대로 튜닝하지 못하면느림
+- 컬럼명, 표현식이 인자로 사용되면 컬럼이나 표현식 결과가 null이 아닌 레코드 건수만 반환
+
+### 7.3.4 SQL 주석
+```SQL
+-- 한 라인 주석
+
+# 한 라인 주석
+
+/* 여러
+라인
+주석처리
+하기*/
+```
+
+/*! : 문법에 일치하지 않는 내용 들어가면 MySQL에서 에러 발생(MySQL 외의 DBMS에서는 순수 주석)
+
+
+## 7.4 SELECT
+
+### 7.4.1 SELECT 각 절의 처리 순서
+```
+FROM > (ON > JOIN) > WHERE > GROUP BY > DISTINCT > HAVING > SELECT > ORDER BY > LIMIT
+```
+
+### 7.4.2 WHERE절과 GROUP BY 절, 그리고 ORDER BY 절의 인덱스 사용
+
+**인덱스 사용 위한 기본규칙**
