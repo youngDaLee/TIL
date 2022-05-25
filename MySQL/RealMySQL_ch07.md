@@ -441,3 +441,22 @@ FROM > (ON > JOIN) > WHERE > GROUP BY > DISTINCT > HAVING > SELECT > ORDER BY > 
 ### 7.4.2 WHERE절과 GROUP BY 절, 그리고 ORDER BY 절의 인덱스 사용
 
 **인덱스 사용 위한 기본규칙**
+- 인덱스된 컬럼 값 자체를 변환하지 않고 그대로 사용
+- B-Tree에 정렬된 인덱스 사용.
+
+인덱스 사용 못하는 경우
+```SQL
+SELECT * FROM salaries WHERE salary*100 > 15000;
+```
+- salaries 컬럼을 가공하여 상수값과 비교하고 있음 -> 인덱스 활용 못함
+
+- 컬럼의 **데이터 타입**과 비교되는 값의 타입이 달라도 인덱스 활용 못함(index 레인지 스캔 불가능 -> 인덱스 풀스캔 하게 됨)
+
+
+**WHERE 절의 인덱스 사용**
+- 범위 제한 조건
+  - 동등 비교 조건, IN으로 구성된 조건이 인덱스 컬럼과 얼마나 좌측부터 일치하는가에 따라 달라짐
+- 체크 조건
+
+
+**GROUP BY 절의 인덱스 사용**
