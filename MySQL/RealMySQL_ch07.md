@@ -167,7 +167,7 @@ SELECT 'abc' REGEXP '^[x-z]';
 - ? : 정규표현식이 0 or 1번만 올 수 있음
 
 ```SQL
-SELECT * FROM domain_table WHERE source_domain REGEXP '(netmarble.net)$';
+SELECT * FROM domain_table WHERE source_domain REGEXP '(test.net)$';
 ```
 
 
@@ -178,8 +178,8 @@ SELECT * FROM domain_table WHERE source_domain REGEXP '(netmarble.net)$';
 - _ : 정확히 1개의 문자에 일치
 - ESCAPE : %, _ 자체를 비교
 ```SQL
-SELECT * FROM domain_table WHERE source_domain LIKE '%netmarble.net';
-SELECT * FROM domain_table WHERE source_domain LIKE '%netmarble.net' ESCAPE '%';
+SELECT * FROM domain_table WHERE source_domain LIKE '%test.net';
+SELECT * FROM domain_table WHERE source_domain LIKE '%test.net' ESCAPE '%';
 ```
 
 **BETWEEN 연산자**
