@@ -3,6 +3,7 @@
 ### Table
 column/row의 이차원 구조 데이터 저장소.
 
+
 Table 구조
 - 열 (column)
 - 필드 (field, value)
