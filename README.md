@@ -29,6 +29,7 @@
 
 ## MySQL
 - [RealMySQL::ch06.실행 계획](MySQL/RealMySQL_ch06.md)
+- [RealMySQL::ch07.쿼리 작성 및 최적화](MySQL/RealMySQL_ch07.md)
 
 
 # 3. Data Engineering
@@ -36,7 +37,7 @@
 
 ## ElasticStack
 - [Installing and Understanding ElasticSearch](ElasticStack/ch01_Understanding_ElasticSearch.md)
-
+- [DataModeling](ElasticStack/DataModeling.md)
 
 # 4. Certificate
 📙 SQLD
