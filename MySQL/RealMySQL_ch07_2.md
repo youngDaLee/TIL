@@ -89,32 +89,294 @@ SELECT DISTINCT(first_name), last_name FROM employees;
 
 ### 7.6.2 JOIN UPDATE
 
+```SQL
+UPDATE tp_test t1, employees e
+SET t1.first_name=e.first_name
+WHERE e.emp_no=t1.emp_no;
+```
+- 사원 번호로 조인하여 employees 테이블 first_name 컬럼을 tp_test의 first_name 컬럼으로 복사
+
+
+옵티마이저에 실행 순서 명시하고 싶을 시 STRAIGHT_JOIN 키워드 사용
+```SQL
+UPDATE (SELECT de.depth_no, COUNT(*) AS emp_count FROM dept_emp de GROUP BY de.dept_no) dc
+  STRAIGHT_JOIN departments d ON dc.dept_no=d.dept_no
+SET d.emp_count=dc.emp_count;
+```
 
 ### 7.7 DELETE
 ### 7.7.1 DELETE ... ORDER BY ... LIMIT n
+ORDER BY, LIMIT 사용하는 방식은 UPDATE와 동일
+```SQL
+DELETE FROM employees ORDER BY first_name LIMIT 10;
+```
 
 ### 7.7.2 JOIN DELETE
+JOIN DELETE로 여러 테이블 조인해 레코드 삭제 가능.
 
+3개 테이블 조인하여 하나의 테이블에서 레코드 삭제하는 쿼리
+```SQL
+DELETE e
+FROM employees e, dept_emp de, departments d
+WHERE e.emp_no=de.emp_no AND de.dept_no=d.dept_no
+  AND d.dept_no='d001';
+```
 
+3개 테이블 조인하여 여러 테이블에서 레코드 삭제하는 쿼리
+```SQL
+DELETE e, de
+FROM employees e, dept_emp de, departments d
+WHERE e.emp_no=de.emp_no AND de.dept_no=d.dept_no
+  AND d.dept_no='d001';
+
+DELETE e, de, d
+FROM employees e, dept_emp de, departments d
+WHERE e.emp_no=de.emp_no AND de.dept_no=d.dept_no
+  AND d.dept_no='d001';
+```
+
+옵티마이저가 조인 순서 결정하지 못하면 STRAIGHT_JOIN 키워드로 조인 순서를 옵티마이저에 지시
+```SQL
+DELETE e, de, d
+FROM  departments d
+  STRAIGHT_JOIN dept_emp de ON e.emp_no=de.emp_no
+  STRAIGHT_JOIN employees e ON de.dept_no=d.dept_no
+WHERE d.dept_no='d001';
+```
 ## 7.8 스키마 조작(DDL)
 ### 7.8.1 데이터베이스
+#### DB 생성
+```SQL
+CREATE DATABASE [IF NOT EXISTS] employees;
+CREATE DATABASE [IF NOT EXISTS] employees CHARACTER SET utf8;
+CREATE DATABASE [IF NOT EXISTS] employees CHARACTER SET utf8 COLLATE utf8_general_ci;
+```
+
+#### DB 목록
+```SQL
+SHOW DATABASES;
+SHOW DATABASES LIKE '%emp%'
+```
+
+#### DB 선택
+```SQL
+USE employees;
+```
+
+#### DB 속성 변경
+```SQL
+ALTER DATABASE employees CHARSET SET=euckr;
+ALTER DATABASE employees CHARSET SET=euckr COLLATE=euckr_korean_ci;
+```
+
+#### DB 삭제
+```SQL
+DROP DATABASE [IF EXIST] employees;
+```
 
 ### 7.8.2 테이블
+#### 테이블 생성
+```SQL
+CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tb_test (
+  member_id BIGINT [UNSIGNED] [AUTO_INCREMENT],
+  nickname CHAR(20) [CHARACTER SET 'utf8'] [COLLATE 'utf8_general_ci'] [NOT NULL],
+  home_url VARCHAR(200) [COLLATE 'latin_general_cs'],
+  birth_year SMALLINT(4) [UNSIGNED] [ZEROFILL],
+  member_point INT [NOT NULL] [DEFAULT 0],
+  registered_dttm DATETIME [NOT NULL],
+  modified_ts TIMESTAMP [NOT NULL] [DEFAULT CURRENT_TIMESTAMP],
+  gender ENUM('Female', 'Male') [NOT NULL],
+  hobby SET('Reading', 'Game', 'Sports'),
+  profile TEXT [NOT NULL],
+  session_data BLOB,
+  PRIMARY KEY (memeber_id),
+  UNIQUE INDEX ux_nickname (nickname),
+  INDEX ix_registereddttm (registered_dttm)
+) ENGINE=INNODB;
+```
+
+#### 테이블 구조 조회
+- `SHOW CREATE TABLE`
+  - 테이블 CREATE TABLE 문장 표시해줌
+  - 최초 테이블 생성 시 사용자가 입력했던 값 그대로 보여주는 것 아님. MySQL 서버가 메타정보 읽어서 CREATE TABLE 명령으로 재작성해서 보여주는 것.
+- `DESC`, `DESCRIBE`
+  - 테이블 컬럼정보 표로 나타님
+
+
+#### 테이블 구조 변경
+```SQL
+ALTER TABLE employees CHARACTER SET 'euckr';
+ALTER TABLE employees ENGINE=myisam;
+```
+- 두번째 명령은 테이블 데이터 리빌드 하는 목적으로도 사용됨.
+  - 리빌드 주 목적 : 레코드 삭제가 자주 발생하는 테이블에서 데이터 저장되지 않은 빈 공간(프래그맨테이션) 제거해 디스크 공간 확보
+
+#### RENAME TABLE
+```SQL
+RENAME emp_stat TO backup_emp_stat;
+
+-- 하나의 트랜잭션에서 여러 테이블 이름 변경 가능
+RENAME emp_stat TO backup_emp_stat
+      temp_emp_stat TO emp_stat;
+```
+- 주로 테이블 바꿔치기 할 때 사용
+- Inno DB에서는 ㅁ낳은 데이터 변경된 뒤 메타 데이터 불일치하는 현상 발생 가능.
+
+#### 테이블 DB 변경
+```SQL
+REMANE TABLE db1.employees TO db2.employees;
+```
+
+#### 테이블 상태 조회
+```SQL
+SHOW TABLE STATUS LIKE 'employees'\G -- \G : 레코드 컬럼을라인당 하나씩 표현하는 옵션(문장의 끝)
+```
+
+#### 테이블 구조 복사
+```SQL
+CREATE TABLE temp_employees LIKE employees;
+```
+
+```SQL
+INSERT INTO temp_employees SELECT * FROM employees;
+```
+- 데이터까지 복사할 경우
+
+#### 테이블 구조 및 데이터 복사
+
+#### 테이블 삭제
+레코드 많지 않은 테이블은 상관 없으나, 레코드 많은 테이블 삭제하는 작업은 부하가 큰 작업에 속함.
+테이블이 크면 서비스 도중 삭제 작업 수행 x
+
+```SQL
+DROP TABLE
+```
+- LOCK_open 이라는 잠금 획득해야 함.
+- A 테이블에 LOCK_open 걸면 A와 무관한 B,C테이블도 LOCK 걸림. 
+- A 테이블 DROP TABLE 명령 완료 시 까지 다른 커넥션 쿼리 처리 못함
 
 ### 7.8.3 컬럼 변경
+#### 컬럼 추가
+```SQL
+ALTER TABLE employees ADD COLUMN emp_telno VARCHAR(20);
+ALTER TABLE employees ADD COLUMN emp_telno VARCHAR(20) ALTER emp_no; -- emp_no 뒤에 컬럼 추가
+```
+
+#### 컬럼 삭제
+```sql
+ALTER TABLE employees DROP COLUMN emp_telno;
+```
+
+#### 컬럼 명, 타입 변경
+`CHANGE COLUMN 지금컬럼명 바꿀컬럼명`
+```SQL
+ALTER TABLE employees CHANGE COLUMN first_name name VARCHAR(14) NOT NULL;
+```
+
+컬럼명 이외의 값이나 NULL 여부 변경
+```SQL
+ALTER TABLE tb_enum MODIFY COLUMN member_hobby ENUM('Tennis', 'Game', 'Climbing');
+```
+
+#### ALTER TABLE 진행 상황
+```SQL
+SHOW GLOBAL STATUS LIKE 'Handler%';
+```
+- Handler_read_rnd_next : 풀 테이블 스캔 방식으로 모든 레코드 읽을 때 읽은 레코드 건수
+- Handler_write : 테이블에 INSERT 되는 레코드 건수
 
 ### 7.8.4 인덱스 변경
+#### 인덱스 추가
+```SQL
+ALTER TABLE employees ADD PRIMARY KEY [USING {BTREE|HASH}] (emp_no);
+ALTER TABLE employees ADD UNIQUE INDEX [USING {BTREE|HASH}] ux_emptelno (emp_telno);
+ALTER TABLE employees ADD INDEX [USING {BTREE|HASH}] ux_emptelno (emp_telno);
+ALTER TABLE employees ADD FULLTEXT INDEX ux_emptelno (emp_telno);
+ALTER TABLE employees ADD SPATIAL INDEX ux_emptelno (emp_telno);
+```
+- PRIMARY KEY : PK 생성 키워드. 어떤 스토리지 엔진에서나 사용 가능
+- UNIQUE INDEX : 키값 중복 허용 X 인덱스. 스토리지 관계 없이 사용 가능
+- FULLTEXT INDEX : 전문검색 인덱스. MyISAM에서만 사용 가능
+- SPATIAL INDEX : 공간 검색 인덱스. MyISAM에서만 사용 가능
+- INDEX : 중복 허용. 일반 보조 인덱스
+
+- 인덱스 알고리즘 선택 가능. 일반적으로 B-TREE 기본 선택됨. -> MEMORY 테이블이나 NDB에 대해서는 HASH 생성
+
+#### 인덱스 조회
+```SQL
+SHOW INDEX FROM employees;
+```
+
+#### 인덱스 삭제
+```SQL
+ALTER TABLE employees DROP PRIMARY KEY;
+ALTER TABLE employees DROP INDEX ix_emptelno;
+```
+
+#### 컬럼 및 인덱스 변경을 모아서 실행
+```SQL
+ALTER TABLE employees 
+  DROP INDEX ix_firstname
+  ADD INDEX ix_new_firstname (first_name)
+  ADD COLUMN emp_telno VARCHAR(15);
+```
+
+#### 인덱스 생성 위한 ALTER 테이블 진행 상황
+InnoDB 사용하는 MySQL 5.1 & MySQL 5.5 이상의 InnoDB 테이블
+- 인덱스 추가 삭제 작업 임시테이블 사용 x
+- 삭제는 바로 수행
+- 그나마 시간 걸리는 작업 -> 인덱스 신규 생성.
+  - 임시테이블 사용 x ("Handler_write" 값 변화 x)
+  - "Handler_read_rnd_nex" 컬럼 변화
+
+MySQL 5.0 InnoDB 테이블, 모든 버전의 MyISAM 테이블
+- ALTER TABLE 명령이 테이블 레코드를 임시테이블로 복사하며 처리됨
 
 ### 7.8.5 프로세스 조회
+```SQL
+SHOW PROCESSLIST;
+```
+- 서버 접속한 사용자 목록
+- 각 클라이언트 사용자가 어떤 쿼리 실행중인지
+
+각 컬럼의 의미
+- id : 스레드 아이디. 쿼리,커넥션 강제종료 시 사용
+- User : 클라이언트가 MySQL 서버 접속 시 사용한 계정
+- Host : 클라이언트 호스트 명, IP 주소
+- db : 클라이언트가 기본으로 사용하는 DB
+- command : 해당스레드가 현재 어떤 작업 하는지
+- Time : command 컬럼에 표시되는 작업이 얼마나 실행되고 있는지
+- State : 소분류. 상당히 많음
+- Info : 실행중인 쿼리 문장 -> 쿼리 전체 확인 시 SHOW FULL PROCESSLIST 명령 사용
 
 ### 7.8.6 프로세스 강제 종료
+```sql
+KILL QUERY 4228;
+KILL 4228;
+```
 
 ### 7.8.7 시스템 변수 조회 및 변경
+```SQL
+SHOW GLOBAL VARIABLES;
+SHOW GLOBAL VARIABLES LIKE '%connections%';
+SHOW SESSION VARIABLES LIKE '%timeout%';
+SHOW VARIABLES LIKE '%timeout%';
+```
 
 ### 7.8.8 경고나 에러 조회
+```SQL
+SHOW WARNINGS;
+```
+- 쿼리 실행 도중 에러 발생 시 에러가 아닌 경고, 정보성 메세지 발생했는지 보여줌.
+- 그런 경고메세지 조회 위해 SHOW WARNINGS 명령 사용
+  - 에러는 SHOW ERRORS;
 
 ### 7.8.9 권한 조회
+```SQL
+SHOW PRIVILEGES;
 
+SHOW GRANTS FOR 'root'@'localhost';  -- 특정 사용자 권한 조회 시 GRANT 사용
+```
 
 ## 7.9 SQL 힌트
 ### 7.9.1 힌트의 사용법
