@@ -379,9 +379,40 @@ SHOW GRANTS FOR 'root'@'localhost';  -- 특정 사용자 권한 조회 시 GRANT
 ```
 
 ## 7.9 SQL 힌트
+MySQL 옵티마이저가 최적의 방법으로 데이터 읽지 못할 때 많음. SQL 문장에 **특별한 키워드를** 지정해 MySQL 옵티마이저에게 최적의 방법 제안. 이런 키워드를 **SQL 힌트** 라 함
 ### 7.9.1 힌트의 사용법
+MySQL에서는 힌트 위치 지정되어 있음. 오라클은 힌트가 주석 일부로 해성되지만, MySQL은 SQL일부로 해석됨. 
+
+```SQL
+SELECT * FROM employees USE INDEX (PRIMARY) WHERE emp_no=10001;
+SELECT * FROM employees /*! USE INDEX (PRIMARY) */ WHERE emp_no=10001;
+```
+- 두 번째의 힌트 기술 방식은 다른 DBMS에서는 힌트를 주석처리 하지만 MySLQ에서는 SQL 일부로 해석.
 
 ### 7.9.2 STRAIGHT_JOIN
+옵티마이저 힌트이면서 조인키워드이기도 함. **조인 순서 고정 역할**
+```SQL
+SELECT *
+FROM employees e, depth_emp de, departments d
+WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
+
+-- STRAGIGHT_JOIN 힌트
+SELECT STRAIGHT_JOIN e.first_name, e.last_name, d.dept_name
+FROM employees e, depth_emp de, departments d
+WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
+
+SELECT STRAIGHT_JOIN /*! e.first_name */, e.last_name, d.dept_name
+FROM employees e, depth_emp de, departments d
+WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
+```
+
+MySQL 힌트는 다른 DBMS에 비해 옵티마이저에 미치는 영향이 큰 편. 힌틀르 잘못 사용하면 훨씬 느려지게 만들 수도 있음.  
+옵티마이저가 확실히 잘못한 경우 아니라면 STRAIGHT_JOIN은 사용 않는것이 좋다.
+
+STARIGHT_JOIN 힌트 사용하는경우
+- 임시테이블(인라인 뷰 혹은 파생된 테이블)과 일반테이블 조인
+- 임시테이블끼리 조인
+- 일반테이블끼리 조인
 
 ### 7.9.3 USE INDEX / FORCE INDEX / IGNORE INDEX
 
