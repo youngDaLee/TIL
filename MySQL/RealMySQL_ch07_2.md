@@ -390,43 +390,207 @@ SELECT * FROM employees /*! USE INDEX (PRIMARY) */ WHERE emp_no=10001;
 - 두 번째의 힌트 기술 방식은 다른 DBMS에서는 힌트를 주석처리 하지만 MySLQ에서는 SQL 일부로 해석.
 
 ### 7.9.2 STRAIGHT_JOIN
-옵티마이저 힌트이면서 조인키워드이기도 함. **조인 순서 고정 역할**
+옵티마이저 힌트이면서 조인키워드이기도 함. **조인 순서 고정 역할**. FROM절에 명시된 순서대로 조인 수행
 ```SQL
 SELECT *
 FROM employees e, depth_emp de, departments d
 WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
 
 -- STRAGIGHT_JOIN 힌트
+-- employees -> depth_emp -> departments 순으로 조인 수행
 SELECT STRAIGHT_JOIN e.first_name, e.last_name, d.dept_name
 FROM employees e, depth_emp de, departments d
 WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
 
-SELECT STRAIGHT_JOIN /*! e.first_name */, e.last_name, d.dept_name
+-- 위와 같은 쿼리
+SELECT /*!STRAIGHT_JOIN*/  e.first_name , e.last_name, d.dept_name
 FROM employees e, depth_emp de, departments d
 WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
+
+
+-- employees -> depth_emp -> departments 순으로 조인 수행
+SELECT /*!STRAIGHT_JOIN*/  e.first_name , e.last_name, d.dept_name
+FROM employees e
+  INNER JOIN depth_emp de ON e.emp_no=de.emp_no
+  INNER JOIN departments d ON d.depth_no=de.depth_no
+
 ```
 
-MySQL 힌트는 다른 DBMS에 비해 옵티마이저에 미치는 영향이 큰 편. 힌틀르 잘못 사용하면 훨씬 느려지게 만들 수도 있음.  
+MySQL 힌트는 다른 DBMS에 비해 옵티마이저에 미치는 영향이 큰 편. 힌트를 잘못 사용하면 훨씬 느려지게 만들 수도 있음.  
+```SQL
+SELECT STRAIGHT_JOIN e.first_name, e.last_name, d.dept_name
+FROM employees e, departments d, depth_emp de
+WHERE e.emp_no=de.emp_no AND d.depth_no=de.depth_no
+```
+- 위 쿼리는, e 테이블과 d 테이블의 직접적인 조건이 없어도 무조건 힌트대로 (employees -> departments -> depth_emp) 조인 수행 => 비효율적
+
 옵티마이저가 확실히 잘못한 경우 아니라면 STRAIGHT_JOIN은 사용 않는것이 좋다.
 
 STARIGHT_JOIN 힌트 사용하는경우
 - 임시테이블(인라인 뷰 혹은 파생된 테이블)과 일반테이블 조인
+  - 임시테이블을 드라이빙으로 선정. 일반테이블 조인컬럼에 인덱스 없으면 레코드 건수 적은 테이블을 드라이빙으로.
 - 임시테이블끼리 조인
+  - 크기가 작은 테이블 드라이빙으로
 - 일반테이블끼리 조인
+  - 레코드 건수 적은 테이블. 한쪽에만 인덱스 있으면 인덱스 없는걸 드라이빙으로
+
+=> 다만 레코드 건수가 전체 레코드 건수가 아닌, 선택되는 레코드 건수이기 때문에 유동적. 웬만하면 옵티마이저 실행계획 따르는 것이 좋음
 
 ### 7.9.3 USE INDEX / FORCE INDEX / IGNORE INDEX
+4개 이상의 컬럼으로 된 인덱스(복잡한 인덱스)에서 MySQL 옵티마이저가 적합한 인덱스를 찾지 못할 경우, **USE INDEX** 혹은 **FORCE INDEX** 이용해서 인덱스 사용 유도 가능.
+
+인덱스 힌트는 인덱스 포함한 테이블 뒤에 괄호로 명시.
+
+#### USE INDEX
+- MySQL 옵티마이저에게 특정 테이블 인덱스 권장
+
+#### FORCE INDEX
+- USE INDEX와 다른점 X. USE INDEX보다 옵티마이저에 미치는 영향이 더 강함.
+
+#### IGNORE INDEX
+- 인덱스를 사용하지 못하게 함.
+- 풀테이블 스캔 유도할 때 사용
+
+#### USE INDEX FOR JOIN
+- JOIN 키워드는 조인뿐만 아니라 레코드 검색용도까지 포함.
+
+#### USE INDEX FOR ORDER BY
+- 명시된 인덱스를 ORDER BY 용으로만 사용
+
+#### USE INDEX FOR JOIN
+- 명시된 인덱스를 GROUP BY로만 사용
+
+```SQL
+SELECT * FROM employees WHERE emp_no=1001;
+SELECT * FROM employees FORCE INDEX(primary) WHERE emp_no=1001;
+SELECT * FROM employees USE INDEX(primary) WHERE emp_no=1001;
+SELECT * FROM employees INGORE INDEX(primary) WHERE emp_no=1001;
+SELECT * FROM employees FORCE INDEX(ix_test_idx) WHERE emp_no=1001;
+```
 
 ### 7.9.4 SQL_CACHE / SQL_NO_CACHE
+MySQL은 쿼리 결과를 재사용하기 위해 쿼리 캐시에 선택적으로 저장. 저장 여부를 결정하는 힌트.
+
+query_cache_type(시스템 변수 설정)
+- 쿼리 결과 저장 여부 결정
+
+힌트 x
+- query_cache_type 시스템 변수 설정 값
+  - 0 or OFF : 캐싱 x
+  - 1 or ON : 캐싱
+  - 2 or DMAND : 캐싱 x
+
+SQL_CACHE
+- query_cache_type 시스템 변수 설정 값
+  - 0 or OFF : 캐싱 x
+  - 1 or ON : 캐싱
+  - 2 or DMAND : 캐싱
+
+SQL_NO_CACHE
+- query_cache_type 시스템 변수 설정 값
+  - 0 or OFF : 캐싱 x 
+  - 1 or ON : 캐싱 x
+  - 2 or DMAND : 캐싱 x
 
 ### 7.9.5 SQL_CALC_FOUND_ROWS
+LIMIT을 걸어도 전체 레코드 건수 반환.
+```SQL
+SELECT SQL_CALC_FOUND_ROWS * FROM employees LIMIT 5;
 
-### 7.9.6 기타 힌트
+SELECT FOUND_ROWS() AS total_record_count;
+```
+페이징 처리 시 활용? -> 효율적이지 않기 때무에 사용하지 않음.
 
 
 ## 7.10 쿼리 성능 테스트
+쿼리의 성능을 판단하기 위해 고려해야 하는 점
 ### 7.10.1 쿼리의 성능에 영향을 미치는 요소
+#### OS 캐시
+대부분의 OS가 한 번 읽은 데이터는 OS가 관리하는 별도의 캐시영역에 보관했다가, 다시 해당 데이터 요청되었을 때 캐시 내용을 바로 MySQL 서버로 반환함. -> InnoDB는 OS 캐시가 큰 영향 x(파일시스템 캐시, 버퍼 거치지 않는 Direct I/O 사용하기 때문). MyISAM은 OS 캐시 의존도 높기 때문에 성능 차이 크다.
 
+OS가 가지고 있는 캐시, 버퍼가 없는 상태에서 쿼리 성능 테스트하기 위해서는 MyhSQL 서버를 재시작하거나, 캐시 삭제 명령 필요
+```
+## 캐시, 버퍼 내용을 디스크와 동기화
+>>> sycn
+
+## OS에 포함된 캐시 내용 초기화
+>>> echo 3 > /proc/sys/vm/drop_caches
+```
+#### MySQL 서버의 버퍼 풀(InnoDB 버퍼풀, MyISAM 키 캐시)
+MySQL 서버도 데이터 파일 내용을 페이지 단위로 캐싱하는 기능 제공함.
+
+#### MySQL 쿼리 캐시
+이전에 실행했던 SQL 문장과, 그 결과를 임시로 저장해두는 메모리공간.
+
+쿼리 캐시 비우기 위해 RESET QUERY CACHE 명령 수행.
+=> 테스트 시 매번 지우기 번거로우므로 SQL_NO_CACHE 옵션 추가하여 쿼리 테스트.
+#### 독립된 MySQL 서버
+MySQL 서버 가동중인 장비에 다른 웹 서버나 배치용 프로그램 실행되면 쿼리 영향 줌.
 ### 7.10.2 쿼리의 성능 테스트
+이해가 안감
+```SQL
+SELECT SQL_NO_CACHE STRAIGHT_JOIN
+  e.first_name, d.depth_name
+FROM employees e, depth_emp de, departments d
+WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no;
+
+
+SELECT SQL_NO_CACHE STRAIGHT_JOIN
+  e.first_name, d.depth_name
+FROM departments d, employees e, depth_emp de
+WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no;
+```
+위 두 쿼리 실행시간을 단축시키기 때문에 임시테이블을 생성하는 방식으로 수정해서 쿼리 테스트를 한다 함.
+
+```SQL
+SELECT SQL_NO_CACHE COUNT(*) FROM(
+  SELECT SQL_NO_CACHE STRAIGHT_JOIN
+    e.first_name, d.depth_name
+  FROM employees e, depth_emp de, departments d
+  WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no;
+)
+
+
+SELECT SQL_NO_CACHE COUNT(*) FROM(
+  SELECT SQL_NO_CACHE STRAIGHT_JOIN
+    e.first_name, d.depth_name
+  FROM departments d, employees e, depth_emp de
+  WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no;
+)
+```
+이렇게 했을 때 왜 실행시간이 단축되는지 이해가 힘들다.
+
+
++) 네트워크 통신 비용 부하 줄임(결과 데이터를 전부 가져오지는 않으므로)
+```SQL
+SELECT SQL_NO_CACHE STRAIGHT_JOIN
+  e.first_name, d.depth_name
+FROM employees e, depth_emp de, departments d
+WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no
+LIMIT 0;
+
+SELECT SQL_NO_CACHE STRAIGHT_JOIN
+  e.first_name, d.depth_name
+FROM departments d, employees e, depth_emp de
+WHERE e.emp_no=de.emp_no AND d.dept_no=de.dept_no
+LIMIT 0;
+```
+
+
 
 ### 7.10.3 쿼리 프로파일링
+쿼리의 각 단계별 작업 시간 확인
 
+```SQL
+>>> SET PROFILING=1; -- 프로파일링 설정 ON
+>>> SHOW VARIABLES LIKE 'profiling'; -- 프로파일링 설정 확인
+```
+
+```SQL
+... 쿼리 실행
+
+>>> SHOW PROFILES;  -- 분석된 쿼리 목록
+>>> SHOW PROFILE FOR QUERY 1;  -- Query_ID=1 인 쿼리의 상세 프로파일링 정보
+>>> SHOW PROFILE;  -- 가장 최근 실행된 쿼리의 프로파일링 정보
+>>> SHOW PROFILE CPU FOR QUERY 1;  -- Query_ID=1 쿼리의 CUP 관련된 내용만 구분해 확인.
+```
