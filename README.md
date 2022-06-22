@@ -28,8 +28,11 @@
 📙 MySQL    
 
 ## MySQL
+- [RealMySQL::ch04.트랜잭션과 잠금](MySQL/RealMySQL_ch04.md)
+- [RealMySQL::ch05.인덱스](MySQL/RealMySQL_ch05.md)
 - [RealMySQL::ch06.실행 계획](MySQL/RealMySQL_ch06.md)
-- [RealMySQL::ch07.쿼리 작성 및 최적화](MySQL/RealMySQL_ch07.md)
+- [RealMySQL::ch07.쿼리 작성 및 최적화 7.1~7.3](MySQL/RealMySQL_ch07.md)
+- [RealMySQL::ch07.쿼리 작성 및 최적화 7.4~](MySQL/RealMySQL_ch07_2.md)
 
 
 # 3. Data Engineering
@@ -61,4 +64,3 @@
 - [크롤링 기초](Crawling/crawling_basic.md)
 - [Scrapy 기초](Crawling/Scrapy_basic.md)
 - [Scrapy를 사용하여 다음 뉴스 크롤링](Crawling/Scrapy_newsCrawl.md)
-
