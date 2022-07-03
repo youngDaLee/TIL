@@ -203,31 +203,161 @@ B-Tree 깊이가 3인 경우 최대 가질 수 있는 키 값
 - 중복된 값이 많을수록 기수성은 낮아지고, 선택도도 낮아짐
 - 선택도가 높을수록 검색 대상이 줄어듦 -> 빠르게 처리됨
 
-#### 읽어야 하는 레코드 건수
+ex)
+```SQL
+CREATE TABLE tb (
+  ...
+  INDEX ix_country (country)
+);
 
+SELECT * FROM tb WHERE contry='korea' and city='seoul';
+-- row 10000개
+-- contry='korea' and city='seoul' 은 1건
+```
+- country 컬럼 유니크 값 10개 일 때
+  - `country='korea'` 검색 시 일치 결과 : (10000/10) = 1000건
+  - 이 중 `city='seoul'` 은 1건이기 때문에 999건을 불필요하게 읽게 됨
+- country 컬럼 유니크 값 1000개 일 때
+  - `country='korea'` 검색 시 일치 결과 : (10000/1000) = 10건
+  - 이 중 `city='seoul'` 은 1건이기 때문에 9건을 불필요하게 읽게 됨
+#### 읽어야 하는 레코드 건수
+- 인덱스를 통해 테이블 레코드 읽는 것은 인덱스 거치지 않고 레코드 읽는 것 보다 높은 비용 발생
+- **인덱스 통해 레코드 1건 읽는 것인 직접 레코드 1건 읽는 것 보다 4~5배 비용 많이 드는 것으로 예측함**
+  - 읽어야 할 레코드 건수가 전체 테이블 레코드 20~25% 이상일 시 풀스캔 처리가 효율적
+- 100만 건 중 50만 건 데이터 읽을 때 인덱스 거쳐서 필요한 50만 건만 읽는게 효율적인지, 풀스캔이 효율적인지 판단해야 함
+  - 인덱스의 손익분기점(20~25%) 이상이기 때문에 풀스캔이 효율적
 
 ### 5.3.4 B-Tree 인덱스를 통한 데이터 읽기
-
 #### 인덱스 레인지 스캔
+- 아래 2가지 접근 방식보다 빠름
+- 검색해야 할 인덱스 범위가 결정되었을 때 사용
+
+```SQL
+SELECT * FROM employees WHERE first_name BETWEEN 'Ebbe' AND 'Gad';
+```
+![range_scan](../.img/mysql/realmysql_ch05_3.jpg)
+![range_scan2](../.img/mysql/realmysql_ch05_4.jpg)
+- 루트노드부터 비교를 시작해 브랜치를 거쳐 리프노드까지 찾아가서 시작 지점을 찾음
+- 시작 지점부터 차례로 읽으며 종료 지점까지 읽음
+- 두 번째 그림처럼 인덱스를 읽으며 레코드를 가져오는 과정도 필요.
+  - 레코드 한 건 단위로 랜덤 I/O가 한 번씩 발생
+  - => 인덱스를 통해 데이터를 읽는 작업은 비용이 많이 든다
 
 #### 인덱스 풀 스캔
+![idx_full](../.img/mysql/realmysql_ch05_5.jpg)
+- 인덱스를 처음부터 끝까지 모두 읽는 방식
+- 조건절에 사용된 컬럼이 인덱스의 첫 번째 컬럼이 아닌 경우 ( IDX(A,B,C) 인데 B컬럼이나 C컬럼 조건절인 경우)
+- 인덱스만 읽는 경우는 풀스캔보다 효과적이지만, 레코드까지 읽어야 하는 경우 절대 인덱스 풀스캔으로 처리 x
 
 #### 루스 인덱스 스캔
+![loose](../.img/mysql/realmysql_ch05_6.jpg)
+- Oracle : 인덱스 스킵 스캔
+- 느슨하게 듬성듬성 인덱슬르 읽는 것
+- 인덱스 레인지 스캔과 비슷하게 작동하지만, 중간에 필요하지 않은 인덱스 키 값은 무시(Skip)하고 다음으로 넘어감
+- GROUP BY 또는 집합함수 가운데 MAX() or MIN()함수에 대해 최적화 하는 경우 발생
+
+```SQL
+INDEX(dept_no, emp_no)
+
+SELECT dept_no, MIN(emp_no)
+FROM dept_emp
+WHERE dep_no, BETWEEN 'd001' AND 'd004'
+GROUP BY dept_no;
+```
+- dept_no 그룹 별 가장 첫번째 emp_no 값만 읽으면 됨
 
 ### 5.3.5 다중 컬럼(Multi-column)인덱스
+![mul](../.img/mysql/realmysql_ch05_7.jpg)
+- 레코드 건수 적은 경우 브랜치 노드 없는 경우 존재(루트, 인덱스 노드 반드시 존재)
+- 인덱스 두번째 컬럼은 첫번째 컬럼에 의존하여 정렬됨
+  - 두번째 컬럼의 정렬은 첫번째 컬럼이 같은 레코드에서만 의미있음
+- 따라서 인덱스 순서 설정 중요!
+
 
 ### 5.3.6 B-Tree 인덱스의 정렬 및 스캔 방향
+인덱스 키값은 항상 오름차순 정렬 -> 인덱스를 거꾸로 읽으면 내림차순 정렬된 인덱스 활용 가능
 #### 인덱스의 정렬
+- 인덱스를 생성하는 시점에 각 컬럼 정렬을 오름차순 혹은 내림차순으로 설정 가능
+- MySQL은 정렬 방식 혼합하여 사용 불가능
+```SQL
+CREATE INDEX ix_test ON emp (team ASC, user DESC);
+```
+- 위 경우 인덱스 생성은 되지만, 실제로는 ASC, DESC 무시하고 모든 컬럼이 오름차순으로 정렬됨
+- ASC, DESC 혼합해서 사용하고 싶으면 컬럼 값을 역으로 변환해서 구현해야 함
+
+```SQL
+-- 7.4.8 Order By
+-- 숫자 타입은 반대 부호로 변환하여 컬럼에 저장!
+```
 
 #### 인덱스 스캔 방향
+- 인덱스는 항상 오름차순으로 정렬되어 있지만, 가까운 방향으로 데이터를 읽어옴
+- 쿼리 Order by 처리나 MIN() MAX() 함수 등의 최적화 필요한 경우 MySQL 옵티마이저가 읽기 방향 전환하여 사용하도록 실행계획 만들어냄
 
 ### 5.3.7 B-Tree 인덱스의 가용성과 효율성
-
+- 쿼리의 WHERE, GROUP BY, ORDER BY 절에서 인덱스 사용하는지 식별 가능해야 쿼리 최적화 가능
+- 어떤 조건에서 인덱스 사용할 수 있는지
+- 인덱스 100% 활용 가능한지
 #### 비교조건의 종류와 효율성
+- 다중 컬럼 인덱스에서 각 컬럼 순서와, 그 컬럼에 사용된 조건이 동등비교인지, 범위조건인지에 따라 각 인덱스 활용 형태 달라짐
 
+![비교](../.img/mysql/realmysql_ch05_8.jpg)
+
+```SQL
+-- case 01
+CREATE INDEX ix_test ON emp (dept_no, emp_no)
+-- case 02
+CREATE INDEX ix_test ON emp (dept_no, emp_no)
+
+
+SELECT * FROM emp
+WHERE dept_no='d001' AND emp_no >= 10114;
+```
+case01
+- 처음 dept_no='d001' and emp_no>=10113 인 레코드 찾은 뒤, dept_no가 d001이 아닐 때 까지 인덱스 쭉 읽으면 됨
+- 필요한 인덱스만 읽게 됨
+- **작업 범위 결정조건**
+
+case02
+- 불필요한 작업 포함됨
+- 오피려 쿼리 실행 더 느리게 만들 때가 많다
+- **필터링 조건, 체크 조건**
 #### 인덱스의 가용성
+![기용성](../.img/mysql/realmysql_ch05_9.jpg)
+- B-Tree 인덱스 특징 : 왼쪽 값에 기준(Left-most)해서 오른쪽 값 정렬됨
+  - 왼쪽이라 함은 하나의 컬럼 뿐만 아닌 다중 컬럼 인덱스에 대해서도 적용됨
+  - 하나의 컬럼으로 검색해도 왼쪽 부분 없으면 인덱스 검색 불가능
 
+
+B-Tree 인덱스 사용 불가능한 경우
+```SQL
+INDEX ix_1 ON emp (first_name);
+INDEX ix_1 ON emp (dept_no, emp_no);
+
+
+SELECT * FROM emp WHERE first_name LIKE '%mer';
+SELECT * FROM emp WHERE emp_no >= 1000;
+```
 #### 가용성과 효율성 판단
+B-Tree 인덱스 사용 불가능한 경우
+- NOT-EQUAL로 비교된 경우(<>, NOT IN, NOT BETWEEN, IS NOT NULL)
+- LIKE '%??' (앞 부분이 아닌 뒷 부분 일치) 형태로 LIKE 연산자 사용
+- 스토어드 함수나 다른 연산자로 **인덱스 컬럼 변형된** 후 비교된 경우
+- NOT-DETERMINISTIC 속성의 스토어드 함수가 비교 조건에 사용된 경우
+- 데이터 타입이 서로 다른 비교(인덱스 컬럼 타입 변환해야 비교 가능한 경우)
+- 문자열 테이터 타입 콜레이션 다른 경우
+
+다중컬럼 인덱스에서 작업 범위 결정 조건으로 인덱스 사용하지 못하는 경우
+- col_1 컬럼에 대한 조건 없는 경우
+- col_1 컬럼 비교 조건이 위의 인덱스 사용 불가 조건 중 하나인 경우
+
+다중컬럼 인덱스에서 작업 범위 결정 조건으로 인덱스 사용하는 경우
+- col_1 ~ col(i-1) 컬럼까지 Equal 형태 비교
+- col_i 컬럼에 대해 다음 연산자 중 하나로 비교
+  - Equal(= 또는 IN)
+  - 크다 작다
+  - LIKE 좌측 일치
+
 
 
 ## 5.4 해시(Hash) 인덱스
@@ -259,3 +389,101 @@ F('Janna') = 9
 - B-Tree와 다르게 어떤 방식으로도 해시 인덱스 사용하지 못하는 경우 발생함
 
 #### 작업 범위 제한 조건으로 해시 인덱스를 사용하는 쿼리
+```SQL
+SELECT * FROM tb_hash WHERE column='검색어';
+SELECT * FROM tb_hash WHERE column<=>'검색어';
+SELECT * FROM tb_hash WHERE column IN ('검색어', '검색어2');
+SELECT * FROM tb_hash WHERE column IS NULL;
+SELECT * FROM tb_hash WHERE column IS NOT NULL;
+```
+- 동등비교조건으로 값 검색하기 때문에 해시 인덱스 장점 그대로 이용 가능
+  - IN 연산자도 여러 동등 연산자로 풀어 처리 가능하기 때문에 같은 효과
+
+#### 해시 인덱스 사용 못하는 쿼리
+```SQL
+SELECT * FROM tb_hash WHERE column>='검색어';
+SELECT * FROM tb_hash WHERE column BETWEEN 100 AND 200;
+SELECT * FROM tb_hash WHERE column LIKE '검색어%';
+SELECT * FROM tb_hash WHERE column <> '검색어';
+
+CREATE TABLE tb_hash2 (
+  ...
+  INDEX ix_mem(member_id, session_id) using HASH
+) ENGINE=MEMORY;
+SELECT * FROM tb_hash2 WHERE member_id='nickname';
+```
+- 범위비교, 부정형 비교는 해시 인덱스 사용 불가
+- 다중 컬럼 인덱스 에서는 모든 컬럼이 동등조건으로 비교되는 경우만 해시 인덱스 사용 가능
+- MEMORY 스토리지 엔진에서는 인덱스 알고리즘 명시하지 않으면 기본적으로 해시 인덱스 적용됨
+
+
+## 5.5 R-Tree 인덱스
+- 기본적인 내부 매커니즘은 B-Tree와 유사
+- B-Tree는 인덱스 구성하는 컬럼 값이 1차원 스칼라값이면, R-Tree는 2차원 공간 개념 값
+
+MySQL 공간 확장
+- 위치 기반 서비스 구현
+- 기능
+  - 공간을 저장할 수 있는 데이터 타입
+  - 공간 데이터 검색을 위한 공간 인덱스(R-Tree 알고리즘)
+  - 공간 데이터 연산 함수(거리 또는 포함 관계 처리)
+
+### 5.5.1 구조 및 특성
+MySQL에서 지원하는 기하학적 도형 데이터 타입
+- POINT
+- LINE
+- POLYGON
+- GEOMETRY
+  - 위 3개 타입의 수퍼타입
+  - POINT, LINE, POLYGON 모두 저장 가능
+
+MBR(Minimum Bounding Rectangle)
+- 해당 도형을 감싸는 최소 크기의 사각형
+
+R-Tree 인덱스
+- MBR 포함관계를 B-Tree 형태로 구현한 것
+
+![Rtree1](../.img/mysql/realmysql_ch05_10.jpg)
+![Rtree2](../.img/mysql/realmysql_ch05_11.jpg)
+- MBR을 3게 레벨로 나눠 저장
+  - 최 상위 : R1, R2
+  - 차상위 : R3 ~ R6
+  - 최 하위 : R7 ~ R14
+- 최상위는 루트노드에, 차상위는 브랜치노드에, 각 도형 객체는 리프노드에 저장됨
+
+### 5.5.2 R-Tree 인덱스 용도
+- 각 도형(MBR)의 포함관계를 이용해 만들어진 인덱스
+- containse(), Intersect() 와 같은 포함관계를 비교하는 함수로 검색을 수행하는 경우 인덱스 이용 가능
+  - 현재 위치 사용자로부터 5km 내 음식점 검색 등...
+
+
+## 5.6 Fractal-Tree 인덱스
+- 최근 개발된 기술
+- TokuTek에서 개발된 MySQL 스토리지 엔진인 TokuDB에만 적용됨
+- 대용량 DBMS 해결책 제시해줄 인덱싱 알고리즘
+
+### 5.6.1 Fractal-Tree 특성
+B-Tree 단점
+- 디스크 랜덤I/O가 상대적으로 많이 필요
+
+=> Fractal-Tree는 이런 B-Tree 단점 최소화 하여 순차I/O로 변환하여 처리 가능
+- 스트리밍(Streaming) B-Tree 라고도 함
+- 인덱스 키 추가되거나 삭제될 때 B-Tree보다 더 많은 정렬 작업 필요 -> 이 때문에 더 많은 CPU 처리 필요할수도..
+- 인덱스 단편화 x 구성, 인덱스 키값 클러스터링 => B-Tree보다 대용량 테이블에서 노은 성능 보장
+- B-Tree : 일정 수준 넘어서면 급격한 성능 저하
+- Fractal-Tree : 급격한 성능 저하 없음
+  - 단편화(fragmentation) : 기억장치 빈 공간 또는 자료가 여러 조각으로 나뉘는 현상
+  - 에이징(Aging) : 오랜 시간동안 데이터 변경되며 단편화 발생, 그 때문에 효율 떨어지는 현상
+- 동시 처리 능력은 B-Tree보다 떨어짐 -> 동시성 처리만 해결되면 TokuDB 위상 높아질 것
+
+### 5.6.2 Fractal-Tree의 가용성과 효율성
+Fractal-Tree 장점
+- B-Tree 장점을 그대로 Fractal-Tree도 가지고 있음
+- B-Tree 인덱스를 그대로 Fractal-Tree로 변경해도 동일한 효과 얻을 수 있음
+  - 변환 시 별도 학습 필요 x
+
+
+## 5.7 전문검색(Full Text search) 인덱스
+
+### 5.7.1 인덱스 알고리즘
+
