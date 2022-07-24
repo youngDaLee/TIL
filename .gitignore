@@ -1,3 +1,8 @@
 .ipynb_checkpoints
 .metals
 .vscode
+.metadata
+.idea
+.bsp
+null
+target
