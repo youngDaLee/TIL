@@ -76,6 +76,38 @@ END;;
 - CREATE SP 하고 난 다음에는 DELEMTER를 다시 돌려야 함
 <img src="https://user-images.githubusercontent.com/64643665/180801318-22d8ddcb-4f0e-430c-8be9-a78fac92b590.png">
 
+- 스토어드 프로시저 변경 시 : ALTER PROCEDURE
+- 삭제 시 : DROP PROCEDURE
+- SP 파라미터, 처리 내용 변경 시 ALTER PROCEDURE 사용 불가 -> DROP PROCEDURE 한 뒤 다시 CREATE PROCEDURE 생성함
+<img src="https://user-images.githubusercontent.com/64643665/180802040-af6dab3a-ec0a-477a-a998-a9dbb8ca869e.png">
+
+#### SP 실행
+**CALL** 을 사용해 실행
+```SQL
+set @o_out_code = 0;
+call sakila.sp_sum(1, 2, @o_out_code);
+select @o_out_code;
+```
+- in 타입은 상수 그대로 전달해도 무방
+  - 세션변수도 무방
+- out, inout은 세션 변수 이용해야 함
+
+#### SP 커서 반환
+SELECT를 호출.. out 코드에 넣지 않아도 결과 반환받을 수 있음 -> 디버깅에 사용
+
+### 11.2.3 스토어드 함수
+
+#### 스토어드 함수 생성 및 삭제
+프로시저와 다른 부분
+- 함수 정의부에 RETURNS로 반환되는 값 명시해야 함
+- 함수 본문 마지막에 정의부에 지정된 타입과 동일한 타입 값을 RETURN 해야 함
+
+프로시저와 달리 본문(BEGIN ... END)에 넣지 못하는 부분
+- PREPARE, EXECUTE 이용한 프리페어 명령문
+- 명시적, 묵시적인 ROLLBACK/COMMIT
+- 재귀호출
+- sp 호출
+- 결과 셋 반환하는 SQL 문장
 
 
 ## 11.3 스토어드 프로그램의 권한 및 옵션
