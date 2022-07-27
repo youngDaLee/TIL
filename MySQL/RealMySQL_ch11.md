@@ -96,7 +96,9 @@ select @o_out_code;
 SELECT를 호출.. out 코드에 넣지 않아도 결과 반환받을 수 있음 -> 디버깅에 사용
 
 ### 11.2.3 스토어드 함수
-
+SQL 구문으로 구현할 수 있는 부분을 SQL문장으로 구현해야 할 때
+- SP보다 제약사항 많기 때문에 가능한 사용 X...
+- 유일한 장점은 그냥 SQL 일부로 사용 가능하다는 것
 #### 스토어드 함수 생성 및 삭제
 프로시저와 다른 부분
 - 함수 정의부에 RETURNS로 반환되는 값 명시해야 함
@@ -108,6 +110,37 @@ SELECT를 호출.. out 코드에 넣지 않아도 결과 반환받을 수 있음
 - 재귀호출
 - sp 호출
 - 결과 셋 반환하는 SQL 문장
+
+```SQL
+-- ## 생성
+CREATE FUNCTION `sf_sum`(param1	INTEGER, param2	INTEGER)
+RETURNS INTEGER
+BEGIN
+
+	DECLARE test INTEGER DEFAULT 0;
+	SET test = param1 + param2;
+    RETURN test;
+
+END
+
+-- ## 삭제
+DROP FUNCTION `sf_sum`
+
+-- ## 실행
+-- CALL로 실행 불가
+select sakila.sf_sum(2, 3);
+
+```
+
+* 생성시 1418 Error
+  * http://www.mysqlkorea.com/gnuboard4/bbs/board.php?bo_table=community_03&wr_id=1965
+  * `SET GLOBAL log_bin_trust_function_creators = 1;`
+  * `log_bin_trust_function_creators` : MySQL의 function, trigger 생성에 대한 제약 강제 기능. 해당 옵션이 off이면 권한이 있어도 트리거와 function을 생성할 수 없다. 또한 root 권한 없는 유저가 생성한 function을 일반 user가 사용할 수 없다
+
+### 11.2.4 트리거
+레코드 저장, 변경 시 미리 정의해둔 작업 실행하는 프로그램
+- AUTO INCREMENT 하는 테이블에 INSERT 트리거걸면 오히려 마스터-슬레이브 간 데이터 차이 발생 가능
+- 테이블 당 하나의 이벤트에 대해 2개 이상의 트리거 등록 불가
 
 
 ## 11.3 스토어드 프로그램의 권한 및 옵션
