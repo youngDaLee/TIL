@@ -1,49 +1,26 @@
-from collections import deque
+import sys
 
-def binary_sort(res, num):
-    if len(res) < 2:
-        lnum = res[0]
-        if lnum <= num:
-            res.append(num)
-            return res
-        else:
-            res.appendleft(num)
-            return res
-    l = 0
-    r = len(res) - 1
-    while l <= r:
-        mid = (l+r) // 2
-        if res[mid] >= num and mid == 0:
-            res.appendleft(num)
-            return res
-        if res[mid] <= num and mid == len(res)-1:
-            res.append(num)
-            return res
 
-        if res[mid] >= num and res[mid-1] <= num:
-            tmp = res[:mid-1]
-            tmp.append(num)
-            tmp += res[mid:]
-            return tmp
-        elif res[mid] <= num and res[mid+1] >= num:
-            tmp = res[:mid]
-            tmp.append(num)
-            tmp += res[mid+1:]
-            return tmp
-        elif res[mid] >= num:
-            r = mid - 1
-        else:
-            l = mid + 1
+'''
+### 런타임 에러
+python은 재귀가 1000번 이상 일어나면 recursion 에러가 발생
+재귀 한도를 늘려줘야 함
+djdh 근데 자꾸 메모리초과남
 
-n = int(input())
+그냥... 다빼고 파이썬 기본 모듈 쓰니까 해결됨
+허무
+'''
 
-res = deque()
-for i in range(n):
-    num = int(input())
-    if not res:
+
+if __name__ == '__main__':
+    n = int(sys.stdin.readline())
+
+    res = []
+    for i in range(n):
+        num = int(sys.stdin.readline())
         res.append(num)
-        continue
-    res = binary_sort(res, num)
 
-for i in res:
-    print(i)
+    res = sorted(res)
+
+    for i in res:
+        print(i)
