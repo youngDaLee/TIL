@@ -224,6 +224,27 @@ MongoDB에서 데이터를 조회하는 명령. 2개 인자 사용 - 첫 번째 
 |$where | 주어진 자바스크립트 표현식에 이치하는 도큐먼트만 반환 | db.user.find({ $where: "obj.low_score>obj.high_score"})|
 
 
+**배열 오퍼레이터**
+|연산자|SQL표기|사용예|
+|:---:|:---:|:---|
+|$all | 배열타입 필드가 파라미터로 주어진 모든 엘리먼트 가졌는지 비교 | db.user.find({tags: { $all: ['tag1', 'tag2']}})|
+|$elemMatch | 모든 조건에 일치하는 엘리먼트를 하나라도 가진 도큐먼트를 검색 | db.user.find({score: { $elemMatch: { $gt: 80, $lt: 90} }})|
+|$size | 배열 엘리먼트 개수 비교 | db.user.find({ score: { $size: 3}})|
+
+
+**비트 오퍼레이터**
+|연산자|SQL표기|사용예|
+|:---:|:---:|:---|
+|$bitAllSet | 필드값 각 비트가 파라미터로 주어진 값 비트처럼 1로 Set되어있는지 비교 | db.user.find({a: { $bitAllSet: 35}})|
+|$bitAnySet | 필드값 비트 중 하나라도 파라미터로 주어진 값 비트처럼 1로 Set되어있는지 비교 | db.user.find({a: { $bitAnySet: 35}})|
+|$bitAllClear | 필드값 각 비트가 파라미터로 주어진 값 비트처럼 0으로 Clear되어있는지 비교 | db.user.find({a: { $bitAllClear: 35}})|
+|$bitAnyClear | 필드값 비트 중 하나라도 파라미터로 주어진 값 비트처럼 0으로 Clear되어있는지 비교 | db.user.find({a: { $bitAnyClear: 35}})|
+s
+
+#### Find 조건
+- 하나의 필드에 대한 조건은 하나의 서브도큐먼트로 모두 모아서 작성해야 한다
+
+
 ## 8.2 확장 검색 쿼리
 
 ## 8.3 스키마 변경(DDL)
