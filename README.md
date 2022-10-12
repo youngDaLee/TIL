@@ -40,7 +40,10 @@
 ## MongoDB
 - [RealMongoDB::ch01.MongoDB](MongoDB/RealMongoDB_ch01.md)
 - [RealMongoDB::ch02.스토리지 엔진](MongoDB/RealMongoDB_ch02.md)
-- [RealMongoDB::ch02.쿼리 개발과 튜닝](MongoDB/RealMongoDB_ch08.md)
+- [RealMongoDB::ch03.복제](MongoDB/RealMongoDB_ch03.md)
+- [RealMongoDB::ch03.샤딩](MongoDB/RealMongoDB_ch04.md)
+- [RealMongoDB::ch08.쿼리 개발과 튜닝](MongoDB/RealMongoDB_ch08.md)
+- [RealMongoDB::ch09.실행계획 및 최적화](MongoDB/RealMongoDB_ch09.md)
 
 # 4. Data Engineering
 📙 ElasticSearch     
