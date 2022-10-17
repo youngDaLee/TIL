@@ -81,6 +81,47 @@ mongostat 도구 사용
 
 
 ## 2.3 WiredTiger 스토리지 엔진
+- 내부적인 잠금경합 최소화를 위해 하자드 포인터(Hazard-Pointer), 스킵리스트(Skip-List) 등의 신기술을 채택함
+- 최근의 RDBMS가 가진 MVCC(잠금없는 데이터 읽기), 파일 압축, 암호화 기능 가지고 있음
+### 2.3.1 wiredTiger config
+MongdDB config 중, wiredTiger와 관련있는 부분
+```YAML
+storage:
+  dbPath: <string> # 데이터 파일 저장 경로
+  indexBulidRetry: <boolean> # 인덱스 생성 비정상적으로 중단된 채 MongoDB서버 재시작하면 인덱스 생성 자동으로 시작할건지
+  repairPath: <string> # 복구 스레드 디렉토리 지정
+  directoryPerDB: <boolean> # DB단위로 디렉토리 나눠서 데이터 파일 저장할건지
+  syncPeriodSecs: <int> # 동기화 주기
+
+  journal:
+    enabled: <boolean> # 서버 저널로그 활성화 여부
+    commiIntervalMs: <num> # 저널로그 주기
+```
+
+```YAML
+engine: wiredTiger
+
+wiredTiger:
+  engineConfig:
+    cacheSizeGB: <number> # wiredtiger 공유 캐시 크기 -> 보통 (RAM//2)-1 크기로 설정함
+    journalCompressor: <string>
+    directoryForIndexes: <boolean>
+  colletionConfig:
+    blockCompresor: <string> # wiredTiger 데이터 압축 알고리즘 설정
+  indexConfig:
+    prefixCompression: <boolean> # 프리픽스 압축 사용 여부 결정
+```
+
+### 2.3.2 WiredTiger 저장 방식
+WiredTiger가 가진 저장소
+- 레코드(row, record) 스토어
+  - 일반적인 RDBMS가 사용하는 저장방식
+  - 기본적으로 B-Tree 알고리즘 사용
+  - 테이블 레코드 한 번에 저장
+- 컬럼 스토어
+  - 대용량 분석(OLAP, DW) 용도로 사용
+- LSM(Log Structured Merged Tree) 스토어
+
 
 ## 2.4 메모리 스토리지 엔진
 
