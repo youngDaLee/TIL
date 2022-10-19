@@ -121,9 +121,38 @@ WiredTiger가 가진 저장소
 - 컬럼 스토어
   - 대용량 분석(OLAP, DW) 용도로 사용
 - LSM(Log Structured Merged Tree) 스토어
+  - NoSQL에서 자주 사용됨. 읽기보다는 쓰기 능력에 집중
+  - B-Tree 사용하지 않고 순차적으로 데이터 저장
+  - 갓 저장된 파일을 Level-0, 얘네가 많아지만 병합해서 Level-n까지 데이터 파일로 저장함
+  - 블록단위로 키 샘플링
+  - N개의 데이터 파일을 검색
 
+WiredTiger에는 레코드 기반의 저장소만 사용됨
+
+### 2.3.3 데이터 파일 구조
+`storage.directoryPerDB` 옵션으로 DB별 디렉토리 구분 가능.
+
+메타 데이터파일
+#### WiredTiger
+- 스토리지 엔진 버전
+#### storage.bson
+- WiredTiger 디렉토리 구조
+
+#### sizeStorer.wt
+- 
+
+### 2.3.4 WiredTiger 내부 작동 방식
+B-Tree구조의 데이터 파일과 서버 크래시(비정상 종료)로부터 데이터 복구를 위한 저널 로그(WAL, Write Ahead Log)로 이루어짐.
+
+
+
+
+
+### 참고 블로그
+- https://rastalion.me/mongodb%EC%9D%98-wiredtiger-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%97%94%EC%A7%84/
 
 ## 2.4 메모리 스토리지 엔진
 
 ## 2.5 기타 스토리지 엔진
+
 

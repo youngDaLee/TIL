@@ -76,7 +76,10 @@ rs.reconfig(cfg)  # 변경된 설정으로 재설정```
 
 
 ## 3.4 복제 아키텍쳐
+MongoDB 복제는 하나의 프라이머리와 여러 세컨드리로 구성됨.   
+OpLog 재생은 실시간으로 변경되는 데이터에 동기화 한느 것. 실제 MongoDB 복제 동기화는 초기 동기화(Initial Sync)/실시간 복제(Replication) 두 가지로 나뉨
 
+### 3.4.1 복제로그(OpLog)구조
 
 ## 3.5 복제 로그(Operation Log) 설정
 
