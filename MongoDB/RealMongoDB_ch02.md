@@ -83,6 +83,13 @@ mongostat 도구 사용
 ## 2.3 WiredTiger 스토리지 엔진
 - 내부적인 잠금경합 최소화를 위해 하자드 포인터(Hazard-Pointer), 스킵리스트(Skip-List) 등의 신기술을 채택함
 - 최근의 RDBMS가 가진 MVCC(잠금없는 데이터 읽기), 파일 압축, 암호화 기능 가지고 있음
+
+특징
+- 컬렉션과 인덱스에 압축 설정이 디폴트
+- MVCC를 통해 읽기와 쓰기 작업 격리 -> 데이터의 일관된 특정 시점 뷰를 볼 수 있게 함
+- 체크포인팅으로 스냅샷 생성
+- journaling : mongod 프로세스 실패 시 데이터 손실되는 시점 업게 함. 수정사항 적용 전에 저장하는 로그 선행 기입을 사용함
+
 ### 2.3.1 wiredTiger config
 MongdDB config 중, wiredTiger와 관련있는 부분
 ```YAML
