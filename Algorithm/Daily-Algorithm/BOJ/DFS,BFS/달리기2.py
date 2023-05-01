@@ -34,9 +34,9 @@ def bfs(x1, y1):
                     visit[nx][ny] = visit[x][y] + 1
                     queue.append((nx,ny))
                 elif (nx == x2-1 and ny == y2-1) : return
-                elif (visit[nx][ny] > visit[x][y] + 1) : break
+                elif (visit[nx][ny] == visit[x][y] + 1) : continue
+                else: break
 
 
 bfs(x1-1, y1-1)
 print(visit[x2-1][y2-1])
- 
