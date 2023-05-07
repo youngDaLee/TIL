@@ -4,39 +4,24 @@ from collections import deque
 def bfs(n, k, visited):
     queue = deque()
     queue.append(n)
-    visited[n] = 1
+    visited[n] = 0
 
     cnt = 0
-    return_bfs = False
     while queue:
         new_n = queue.popleft()
+        if new_n == k:
+            cnt += 1
+            continue
 
-        if visited[new_n-1] == 0:
-            visited[new_n-1] = visited[new_n] + 1
-            if (new_n-1 == k):
-                cnt += 1
-                return_bfs = True
-            queue.append(new_n-1)
-        if visited[new_n+1] == 0:
-            visited[new_n+1] = visited[new_n] + 1
-            if (new_n+1 == k):
-                cnt += 1
-                return_bfs = True
-            queue.append(new_n+1)
-        if new_n*2 < len(visited) and visited[new_n*2] == 0:
-            visited[new_n*2] = visited[new_n] + 1
-            if (new_n*2 == k):
-                cnt += 1
-                return_bfs = True
-            queue.append(new_n*2)
-        
-        if return_bfs:
-            return visited[new_n] + 1, cnt
+        for x in (new_n-1, new_n+1, new_n*2):
+            if -1 < x < len(visited) and (visited[x]==-1 or visited[x] == visited[new_n]+1):
+                visited[x] = visited[new_n]+1
+                queue.append(x)
 
-    return -1
+    return visited[k], cnt
 
 n, k = map(int, input().split())
-visited = [0] * (max(n, k)*2)
-res = bfs(n, k, visited)
+visited = [-1] * (max(n, k)*2)
+res, cnt = bfs(n, k, visited)
 print(res)
-print(visited)
+print(cnt)
