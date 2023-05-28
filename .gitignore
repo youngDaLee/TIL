@@ -4,5 +4,6 @@
 .metadata
 .idea
 .bsp
+.prettierignore
 null
 target

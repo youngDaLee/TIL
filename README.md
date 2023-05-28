@@ -21,7 +21,7 @@
 📙 Django    
 
 ## Flask
-- 
+
 ## Django
 - [Django 기초](Django/Django_basic.md)
 
@@ -65,11 +65,13 @@
 📙 Crawling    
 
 ## Git
-- [Git 환경설정](Git/git환경설정.md)
-- [SourceTree로 Github 사용하기](Git/[sourcetree]basic.md)
-- [SourceTree롤 GitHub 협업하기](Git/[sourcetree]branch.md)
+- [Git 환경설정](git/git환경설정.md)
+- [SourceTree로 Github 사용하기](git/[sourcetree]basic.md)
+- [SourceTree롤 GitHub 협업하기](git/[sourcetree]branch.md)
+
 ## CleanCode
-- 
+- [Java PlayGround with TDD::ch01.숫자야구게임](./CleanCode/JAVAPlayGroundTDD_ch01.숫자야구게임.md)
+
 ## Crawling
 - [크롤링 기초](Crawling/crawling_basic.md)
 - [Scrapy 기초](Crawling/Scrapy_basic.md)
