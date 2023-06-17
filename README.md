@@ -2,6 +2,8 @@
 🏃‍♂️Today I Learn
 - 의미없는 커밋은 지양하자.
 
+## 0. Books
+
 ## 1. Computer Science
 📙 [Alogrithm](Algorithm)
 
@@ -9,8 +11,8 @@
 
 ## 2. Language
 📙 [Python](python)
-
 📙 [Java](Java)
+📙 [Scala](Scala)
 
 ## 3. Framework
 📙 [Flask](Flask)
