@@ -5,30 +5,25 @@
 ## 0. Books
 
 ## 1. Computer Science
-📙 [Alogrithm](Algorithm)
-
-📙 [Operating System](OperationgSystem)
+* 📙 [Alogrithm](Algorithm)
+* 📙 [Operating System](OperationgSystem)
 
 ## 2. Language
-📙 [Python](python)
-📙 [Java](Java)
-📙 [Scala](Scala)
+* 📙 [Python](python)
+* 📙 [Java](Java)
+* 📙 [Scala](Scala)
 
 ## 3. Framework
-📙 [Flask](Flask)
-
-📙 [Django](Django)
-
-📙 [SpringBoot](SpringBoot)
+* 📙 [Flask](Flask)
+* 📙 [Django](Django)
+* 📙 [SpringBoot](SpringBoot)
 
 ## 4. DataBase
-📙 [MySQL](DB/MySQL/)
-
-📙 [MongoDB](DB/MongoDB/)
+* 📙 [MySQL](DB/MySQL/)
+* 📙 [MongoDB](DB/MongoDB/)
 ## 5. Data Engineering
-📙 [ElasticSearch](ElasticStack)
-
-📙 [Crawling](Crawling)
+* 📙 [ElasticSearch](ElasticStack)
+* 📙 [Crawling](Crawling)
 
 ## 6. Tool
-📙 [Git](git)
+* 📙 [Git](git)
