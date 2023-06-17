@@ -16,7 +16,7 @@
 ## 3. Framework
 * 📙 [Flask](Flask)
 * 📙 [Django](Django)
-* 📙 [SpringBoot](SpringBoot)
+* 📙 [Spring](Spring)
 
 ## 4. DataBase
 * 📙 [MySQL](DB/MySQL/)
