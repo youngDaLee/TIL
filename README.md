@@ -11,19 +11,17 @@
 ## 2. Language
 * 📙 [Python](python)
 * 📙 [Java](Java)
-* 📙 [Scala](Scala)
 
 ## 3. Framework
-* 📙 [Flask](Flask)
 * 📙 [Django](Django)
 * 📙 [Spring](Spring)
 
 ## 4. DataBase
 * 📙 [MySQL](DB/MySQL/)
 * 📙 [MongoDB](DB/MongoDB/)
-## 5. Data Engineering
-* 📙 [ElasticSearch](ElasticStack)
-* 📙 [Crawling](Crawling)
 
-## 6. Tool
+## 5. Data
+* 📙 [ElasticSearch](ElasticStack)
+
+## 6. DevOps
 * 📙 [Git](git)
