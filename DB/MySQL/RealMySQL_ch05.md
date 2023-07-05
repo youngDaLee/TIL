@@ -137,7 +137,7 @@ Insert 시 키값 반영
 - MyISAM or Memory : 즉시 새로운 키값을 B-Tree 인덱스에 반영. 키 추가하는 작업 완료 까지 클라이언트는 쿼리 결과 받지 못하고 기다림. "delay-key-write" 파라미터 설정해서 인덱스 키 추가 작업 지연 가능 -> 동시 작업 환경에서 적합하지 않음
 - InnoDB : 좀 더 지능적으로 처리. 인덱스 키 추가 작업을 지연시킬지 바로 처리할지 결정함.
 
-![ch05_1](../.img/mysql/realmysql_ch05_1.png)
+![ch05_1](.img/realmysql_ch05_1.png)
 1. 사용자 쿼리 실행
 2. InnoDB 버퍼 풀에 새로운 키 값 추가할 페이지(B-Tree 리프노드) 존재하면 즉시 키 추가 처리
 3. 버퍼풀에 B-Tree 리프노드 없으면 인서트 버퍼에 추가할 키 값과 레코드 주소를 임시로 기록해두고 작업 완료(사용자 쿼리 실행 완료됨)
@@ -186,7 +186,7 @@ B-Tree 인덱스는 인덱스 구성하는 컬럼 크기와 레코드 건수, �
 - B-Tree 자식노드 개수는 **인덱스 페이지 크기** 와 **키 값의 크기**에 따라 결정됨
 - InnoDB의 모든 페이지 크기는 16KB로 고정
 
-![ch05_2](../.img/mysql/realmysql_ch05_2.jpg)
+![ch05_2](.img/realmysql_ch05_2.jpg)
 
 
 #### B-Tree 깊이
@@ -235,8 +235,8 @@ SELECT * FROM tb WHERE contry='korea' and city='seoul';
 ```SQL
 SELECT * FROM employees WHERE first_name BETWEEN 'Ebbe' AND 'Gad';
 ```
-![range_scan](../.img/mysql/realmysql_ch05_3.jpg)
-![range_scan2](../.img/mysql/realmysql_ch05_4.jpg)
+![range_scan](.img/realmysql_ch05_3.jpg)
+![range_scan2](.img/realmysql_ch05_4.jpg)
 - 루트노드부터 비교를 시작해 브랜치를 거쳐 리프노드까지 찾아가서 시작 지점을 찾음
 - 시작 지점부터 차례로 읽으며 종료 지점까지 읽음
 - 두 번째 그림처럼 인덱스를 읽으며 레코드를 가져오는 과정도 필요.
@@ -244,13 +244,13 @@ SELECT * FROM employees WHERE first_name BETWEEN 'Ebbe' AND 'Gad';
   - => 인덱스를 통해 데이터를 읽는 작업은 비용이 많이 든다
 
 #### 인덱스 풀 스캔
-![idx_full](../.img/mysql/realmysql_ch05_5.jpg)
+![idx_full](.img/realmysql_ch05_5.jpg)
 - 인덱스를 처음부터 끝까지 모두 읽는 방식
 - 조건절에 사용된 컬럼이 인덱스의 첫 번째 컬럼이 아닌 경우 ( IDX(A,B,C) 인데 B컬럼이나 C컬럼 조건절인 경우)
 - 인덱스만 읽는 경우는 풀스캔보다 효과적이지만, 레코드까지 읽어야 하는 경우 절대 인덱스 풀스캔으로 처리 x
 
 #### 루스 인덱스 스캔
-![loose](../.img/mysql/realmysql_ch05_6.jpg)
+![loose](.img/realmysql_ch05_6.jpg)
 - Oracle : 인덱스 스킵 스캔
 - 느슨하게 듬성듬성 인덱슬르 읽는 것
 - 인덱스 레인지 스캔과 비슷하게 작동하지만, 중간에 필요하지 않은 인덱스 키 값은 무시(Skip)하고 다음으로 넘어감
@@ -267,7 +267,7 @@ GROUP BY dept_no;
 - dept_no 그룹 별 가장 첫번째 emp_no 값만 읽으면 됨
 
 ### 5.3.5 다중 컬럼(Multi-column)인덱스
-![mul](../.img/mysql/realmysql_ch05_7.jpg)
+![mul](.img/realmysql_ch05_7.jpg)
 - 레코드 건수 적은 경우 브랜치 노드 없는 경우 존재(루트, 인덱스 노드 반드시 존재)
 - 인덱스 두번째 컬럼은 첫번째 컬럼에 의존하여 정렬됨
   - 두번째 컬럼의 정렬은 첫번째 컬럼이 같은 레코드에서만 의미있음
@@ -301,7 +301,7 @@ CREATE INDEX ix_test ON emp (team ASC, user DESC);
 #### 비교조건의 종류와 효율성
 - 다중 컬럼 인덱스에서 각 컬럼 순서와, 그 컬럼에 사용된 조건이 동등비교인지, 범위조건인지에 따라 각 인덱스 활용 형태 달라짐
 
-![비교](../.img/mysql/realmysql_ch05_8.jpg)
+![비교](.img/realmysql_ch05_8.jpg)
 
 ```SQL
 -- case 01
@@ -323,7 +323,7 @@ case02
 - 오피려 쿼리 실행 더 느리게 만들 때가 많다
 - **필터링 조건, 체크 조건**
 #### 인덱스의 가용성
-![기용성](../.img/mysql/realmysql_ch05_9.jpg)
+![기용성](.img/realmysql_ch05_9.jpg)
 - B-Tree 인덱스 특징 : 왼쪽 값에 기준(Left-most)해서 오른쪽 값 정렬됨
   - 왼쪽이라 함은 하나의 컬럼 뿐만 아닌 다중 컬럼 인덱스에 대해서도 적용됨
   - 하나의 컬럼으로 검색해도 왼쪽 부분 없으면 인덱스 검색 불가능
@@ -443,8 +443,8 @@ MBR(Minimum Bounding Rectangle)
 R-Tree 인덱스
 - MBR 포함관계를 B-Tree 형태로 구현한 것
 
-![Rtree1](../.img/mysql/realmysql_ch05_10.jpg)
-![Rtree2](../.img/mysql/realmysql_ch05_11.jpg)
+![Rtree1](.img/realmysql_ch05_10.jpg)
+![Rtree2](.img/realmysql_ch05_11.jpg)
 - MBR을 3게 레벨로 나눠 저장
   - 최 상위 : R1, R2
   - 차상위 : R3 ~ R6

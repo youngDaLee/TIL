@@ -61,7 +61,7 @@ FROM walkdb.walkingtrails
 WHERE region='은평구'
 LIMIT 10;
 ```
-![explain](../.img/mysql/realmysql_ch06_1.PNG)
+![explain](.img/realmysql_ch06_1.PNG)
 - 표 형태로 된 1줄 이상의 결과 표시됨
 ### 6.2.1 id 칼럼
 **단위(SELECT) 쿼리** : SELECT 키워드 단위로 구분한 것
@@ -71,9 +71,9 @@ LIMIT 10;
 - 하나의 SELECT 문장 안에서 여러 테이블 조인하면, 조인하는 테이블 개수만큼 실행계획 레코드 출력되지만, 같은 id가 부여됨.
 - SELECT 문장은 하나인데 여러 테이블 조인되는 경우는 id값증가하지 않고 같은 id 부여됨
 
-![id](../.img/mysql/realmysql_ch06_2.PNG)
+![id](.img/realmysql_ch06_2.PNG)
 
-![id2](../.img/mysql/realmysql_ch06_3.PNG)
+![id2](.img/realmysql_ch06_3.PNG)
 
 ### 6.2.2 select_type 칼럼
 각 SELECT 쿼리가 어떤 타입의 쿼리인지 표시. 수행속도에 절대적인건 아님. 어떻게 실행되고 있냐~ 이정도만 확인하는거고 얘로 튜닝하지는 않음
