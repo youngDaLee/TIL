@@ -1,8 +1,6 @@
 # TIL
-🏃‍♂️Today I Learn
+🏃Today I Learn
 - 의미없는 커밋은 지양하자.
-
-## 0. Books
 
 ## 1. Computer Science
 * 📙 [Alogrithm](Algorithm)
