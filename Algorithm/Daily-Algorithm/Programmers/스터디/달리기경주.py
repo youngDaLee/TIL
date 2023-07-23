@@ -1,4 +1,5 @@
 '''
+https://school.programmers.co.kr/learn/courses/30/lessons/178871?language=python3
 현재 선수 등수가 담긴 배열 players
 해설진이 이름을 부르면 추월 -> 해설진이 부른 이름 리스트 calling
 최종 등수를 리턴
