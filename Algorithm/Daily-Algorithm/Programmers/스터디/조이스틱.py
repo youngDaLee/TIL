@@ -2,19 +2,24 @@
 https://school.programmers.co.kr/learn/courses/30/lessons/42860
 '''
 def get_min_find(num_list):
-    a_list = [len(num_list)+1]
-    for i in range(len(num_list)):
+    a_list = [len(num_list)-1]
+    i = 0
+    while (i < len(num_list)):
         if num_list[i] == 0:
             idx = i
             a_num = 0
-            while(num_list[i] == 0):
+            while(i < len(num_list) and num_list[i] == 0):
                 a_num += 1
                 i += 1
 
-            if(idx == 0): idx=1
-            a_list.append(len(num_list)-1 - a_num + (idx-1))
+            idx = 1 if (idx==0) else idx
 
-    return min(a_list) +sum(num_list) 
+            a_list.append(len(num_list)-1 - a_num + (idx-1))
+        i+=1
+
+    print(a_list)
+    return min(a_list) + sum(num_list) 
+
 
 def solution(name):
     answer = 0
@@ -24,14 +29,11 @@ def solution(name):
         change_num = min(ord(alpha)-ord('A'), ord('Z')-ord(alpha)+1)
         num_list.append(change_num)
 
-    if 0 in num_list:
-        answer = get_min_find(num_list)
-    else:
-        answer = sum(num_list) + len(num_list) - 1
+    answer = get_min_find(num_list)
     return answer
 
 
-print(solution("JAN"))
+print(solution("JAZAZAAAZAAAAAAAZ"))
 
 
 '''
