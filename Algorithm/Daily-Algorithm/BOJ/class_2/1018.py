@@ -30,10 +30,29 @@ for i in range(n):
         if black_line[j] != chess_line[j]:
             black_cnt[i][j] = 1
 
-black_res = 0
-white_res = 0
-for i in range(0, n-8):
-    for j in range(0, m-8):
-        now_black_res = sum(black_cnt[])
+black_res = 50 * 50
+white_res = 50 * 50
+for i in range(0, n-7):
+    for j in range(0, m-7):
+        now_black_res = sum(black_cnt[i][j:j+8])
+        now_black_res += sum(black_cnt[i+1][j:j+8])
+        now_black_res += sum(black_cnt[i+2][j:j+8])
+        now_black_res += sum(black_cnt[i+3][j:j+8])
+        now_black_res += sum(black_cnt[i+4][j:j+8])
+        now_black_res += sum(black_cnt[i+5][j:j+8])
+        now_black_res += sum(black_cnt[i+6][j:j+8])
+        now_black_res += sum(black_cnt[i+7][j:j+8])
 
-print(white_cnt, black_cnt)
+        now_white_res = sum(white_cnt[i][j:j+8])
+        now_white_res += sum(white_cnt[i+1][j:j+8])
+        now_white_res += sum(white_cnt[i+2][j:j+8])
+        now_white_res += sum(white_cnt[i+3][j:j+8])
+        now_white_res += sum(white_cnt[i+4][j:j+8])
+        now_white_res += sum(white_cnt[i+5][j:j+8])
+        now_white_res += sum(white_cnt[i+6][j:j+8])
+        now_white_res += sum(white_cnt[i+7][j:j+8])
+
+        black_res = min(black_res, now_black_res)
+        white_res = min(white_res, now_white_res)
+
+print(min(black_res, white_res))
