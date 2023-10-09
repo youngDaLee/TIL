@@ -73,7 +73,7 @@ InnoDB vs MyISAM
   * 인덱스 하나도 없는 경우 작업 비용 1
   * 인덱스 3개가 있는 경우는 5.5(1.5*3 + 1)정도 비용이 드는 것으로 예측
   * => 비용 대부분이 메모리/CPU가 아닌 디스크로부터 인덱스 페이지 읽고쓰기 하는데 걸리는 시간
-* MyISAM, MEMORY : INSERT 실행 즉시 B-Tree rkqt qusrud
+* MyISAM, MEMORY : INSERT 실행 즉시 B-Tree 값 변경
 * InnoDB : 인덱스 키 추가 작업 지연처리...(PK, UK는 중복체크 필요해서 즉시 처리) => 4.2.10 참고
 
 인덱스 키 삭제
