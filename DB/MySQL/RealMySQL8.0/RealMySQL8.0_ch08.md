@@ -189,6 +189,8 @@ SELECT * FROM employess WHERE gender='M' AND birth_date >= '1965-02-01';
   * WHERE 조건절에 조건이 없는 인덱스의 선행 컬럼의 유니크한 값의 개수가 적어야 함
   * 커버링 인덱스 여야 함 -> 커버링 인덱스 아니면 풀스캔으로 실행계획 수립됨...
 
+### 8.3.5 Multi-column(다중컬럼) 인덱스
+
 
 ## 질문
 * InnoDB에서 UK 속성의 인덱스는 쓰기 성능이 많이 느릴까?(=MyISAM과 유사할까)
