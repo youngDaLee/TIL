@@ -1,21 +1,12 @@
-# 일일 회고
+# (Deprecated) 일일 회고
 매일 공부하고 회고하는 습관을 가지자~
 
-# Template
-## 🗓 2023.06.17
-### ⭐️ 주간 목표
-- [ ] 한 주간 할 일. 매 주 월요일 한 주의 목표를 설정
+# 일일회고 링크
+* 2023.07 ~ 일일 회고를 아래 시트에 작성하고 있습니다
 
-### 📖 TIL
-- Today I Learn. 오늘 배운 것
-
-### 👍 GOOD
-- 잘 한 일. 앞으로 계속 해 나가야 할 일.
-
-### 👎 BAD
-- 잘 못한 일. 개선해나가야 할 일.
-
-### 🌈 FUTURE
-- 앞으로 하고자 하는 일
-
-### 🤔 회고
+|                                                         시트 url                                                         |         설명          |
+|:----------------------------------------------------------------------------------------------------------------------:|:-------------------:|
+| [🐉2024 Daily](https://docs.google.com/spreadsheets/d/1-lQeUsZOo7kviExKFLYgoNayB7BmGFAxDzJHklVzeDc/edit#gid=91150660)  |     2024년 일일 회고     |
+| [🐰2023 Daily](https://docs.google.com/spreadsheets/d/1a6SoqBQzFP5SsxTAv33Zf7A6eW2Oy5K7T3IKzryWZBs/edit#gid=904019786) |     2023년 일일 회고     |
+|  [월간회고 + 독서](https://docs.google.com/spreadsheets/d/1-KYd5IeomdpoFJTKEH7JBxCkEC_G3gWDDQ_X-eahrl0/edit#gid=2039696792)  | 2023년 월간 회고 + 독서 토론 |
+|     [주간회고](https://docs.google.com/spreadsheets/d/1rJTUN4j2Qs3uWSzEQIc_Wr5Je2qYPTW1PnO6DKtLB1Y/edit#gid=542497109)     |     2023년 주간 회      |
