@@ -2,14 +2,12 @@
 🏃Today I Learn
 - 의미없는 커밋은 지양하자.
 
-## Algorithm
-> 알고리즘 문제 풀이 기록
+# TIL
+> 매일 공부 기록 및 회고
 
-|                    title                     | description        |
-|:--------------------------------------------:|:-------------------|
-| [Daily-Algorithm](Algorithm/Daily-Algorithm) | 알고리즘 문제 풀이 모음      |
-|  [JavaAlgorithm](Algorithm/JavaAlgorithm)  | 자바로 작성한 알고리즘 문제 풀이 |
-
+|  title   | description  |
+|:--------:|:-------------|
+| [TIL](TIL) | 일일 공부 기록 및 회고 |
 
 ## BE
 > 백엔드 스킬 공부 기록
