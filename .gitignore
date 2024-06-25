@@ -10,3 +10,6 @@ target
 .DS_Store
 DS_Store
 *.xcodeproj
+node_modules
+package-lock.json
+package.json

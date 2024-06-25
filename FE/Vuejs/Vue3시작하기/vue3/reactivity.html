@@ -1,0 +1,26 @@
+<div id="app">
+  <!-- 여기에 무언가 랜더링(화면에 표시) 된다 -->
+</div>
+
+<!-- https://v2.vuejs.org/v2/guide/reactivity.html -->
+<script>
+  var data = {
+    message: 10,
+  }
+
+  function render(sth) { // DOM API : 태그 정보를 조작할 수 있는 방식
+    var div = document.querySelector('#app');
+    div.innerHTML = sth;  // render 함수를 호출할 때, id=app 안의 요소를 sth로 변경
+  }
+
+  var app = new Proxy(data, {
+    get() {
+      console.log('hi')
+    },
+    set(target, prop, newValue) {
+      console.log('갱신')
+      target[prop] = newValue;  // data 값을 변경하겠다
+      render(newValue); // 화면 div 태그에 값을 집어넣겠다
+    }
+  })
+</script>
