@@ -14,27 +14,44 @@
 
 <script>
   import axios from 'axios';
+import { ref } from 'vue';
 
   export default {
-    data() {
-      return {
-        username: '',
-        password: '',
-      }
-    },
-    methods: {
-      submitForm() {
-        const data = {
-          username: this.username,
-          password: this.password,
-        }
-        axios.post('https://jsonplaceholder.typicode.com/users/', data)
-          .then(response=> {
+    setup() {
+      var username = ref('');
+      var password = ref('');
+
+      // methods
+      var submitForm = () => {
+        axios.post('https://jsonplaceholder.typicode.com/users/', {
+          username: username.value,
+          password: password.value,
+        }).then(response=> {
             console.log(response);
-          });
-        console.log("제출됨")
+        });
       }
+
+      return { username, password, submitForm }
     }
+    // data() {
+    //   return {
+    //     username: '',
+    //     password: '',
+    //   }
+    // },
+    // methods: {
+    //   submitForm() {
+    //     const data = {
+    //       username: this.username,
+    //       password: this.password,
+    //     }
+    //     axios.post('https://jsonplaceholder.typicode.com/users/', data)
+    //       .then(response=> {
+    //         console.log(response);
+    //       });
+    //     console.log("제출됨")
+    //   }
+    // }
   }
 </script>
 
