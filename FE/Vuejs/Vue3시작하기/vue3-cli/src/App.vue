@@ -1,26 +1,33 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <AppHeader 
+  v-bind:appTitle="message"
+  v-on:change="changeMessage"
+  >
+  </AppHeader>
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AppHeader from './components/AppHeader.vue'
 
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    // 'AppHeader': AppHeader,
+    AppHeader
+  },
+  data() {
+    return {
+      message: '앱헤더 컴포넌트',
+    }
+  },
+  methods: {
+    changeMessage() {
+      this.message='변경됨'
+    }
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+
 </style>
