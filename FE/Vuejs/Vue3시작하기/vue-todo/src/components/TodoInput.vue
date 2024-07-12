@@ -9,7 +9,7 @@
 import { ref } from 'vue';
 
 export default {
-    setup() {
+    setup(props, context) {
       // data
       const todoInput = ref('');
 
@@ -17,7 +17,12 @@ export default {
       function addTodo() {
         const todo = todoInput.value;
         localStorage.setItem(todo, todo);
+        // this.$emit('')
+        context.emit('add', todo);
+        clearTodo();
       }
+
+      const clearTodo = () => todoInput.value = '';
 
       return { todoInput, addTodo }
     }
