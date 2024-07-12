@@ -9,6 +9,7 @@ import TodoHeader from '@/components/TodoHeader.vue';
 import TodoInput from '@/components/TodoInput.vue';
 import TodoList from '@/components/TodoList.vue';
 import { useTodo } from './hooks/useTodo';
+import { onBeforeMount } from 'vue';
 
 export default {
   components: {
@@ -24,9 +25,14 @@ export default {
   setup() {
     const { 
       todoItems, 
-      addTodoItem
-      // fetchTodos, 
+      addTodoItem,
+      fetchTodos,
     } = useTodo();
+
+    // 라이프 사이클 API
+    onBeforeMount(() => {
+      todoItems.value = fetchTodos();
+    });
 
     return { todoItems, addTodoItem }
   },

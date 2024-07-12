@@ -1,4 +1,4 @@
-import { onBeforeMount, ref } from 'vue';
+import { ref } from 'vue';
 
 function useTodo() {
   // data
@@ -20,12 +20,7 @@ function useTodo() {
     localStorage.setItem(todo, todo);
   }
 
-  // 라이프 사이클 API
-  onBeforeMount(() => {
-    todoItems.value = fetchTodos();
-  });
-
-  return { todoItems, addTodoItem }
+  return { todoItems, addTodoItem, fetchTodos }
 }
 
 
