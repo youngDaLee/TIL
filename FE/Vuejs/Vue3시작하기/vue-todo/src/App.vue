@@ -8,7 +8,7 @@
 import TodoHeader from '@/components/TodoHeader.vue';
 import TodoInput from '@/components/TodoInput.vue';
 import TodoList from '@/components/TodoList.vue';
-import { onBeforeMount, ref } from 'vue';
+import { useTodo } from './hooks/useTodo';
 
 export default {
   components: {
@@ -22,29 +22,11 @@ export default {
     }
   },
   setup() {
-    // data
-    const todoItems = ref([]);
-
-    // methods
-    function fetchTodos() {
-      const result = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const todoItem = localStorage.key(i);
-        // items.value.push(todoItem);
-        result.push(todoItem);
-      }
-      return result;
-    }
-
-    function addTodoItem(todo) {
-      todoItems.value.push(todo);
-      localStorage.setItem(todo, todo);
-    }
-
-    // 라이프 사이클 API
-    onBeforeMount(() => {
-    todoItems.value = fetchTodos();
-    });
+    const { 
+      todoItems, 
+      addTodoItem
+      // fetchTodos, 
+    } = useTodo();
 
     return { todoItems, addTodoItem }
   },
