@@ -41,10 +41,8 @@ export default {
       localStorage.setItem(todo, todo);
     }
 
-    console.log('setup called')
     // 라이프 사이클 API
     onBeforeMount(() => {
-    console.log('mount called')
     todoItems.value = fetchTodos();
     });
 
