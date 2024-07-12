@@ -8,7 +8,7 @@
 import TodoHeader from '@/components/TodoHeader.vue';
 import TodoInput from '@/components/TodoInput.vue';
 import TodoList from '@/components/TodoList.vue';
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 
 export default {
   components: {
@@ -41,7 +41,12 @@ export default {
       localStorage.setItem(todo, todo);
     }
 
+    console.log('setup called')
+    // 라이프 사이클 API
+    onBeforeMount(() => {
+    console.log('mount called')
     todoItems.value = fetchTodos();
+    });
 
     return { todoItems, addTodoItem }
   },
