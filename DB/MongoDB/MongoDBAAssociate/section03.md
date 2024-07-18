@@ -364,17 +364,265 @@ query planner
 * D. executionStages
 * E. totalKeysExamined
 
-### Lesson 3: Optimzed compound indexes
+### (다시보기...) Lesson 3: Optimzed compound indexes
+* 딱 맞는 인덱스가 없으면 몽고디비가 execution metrics에서 최고점수를 가져온다...
+
+> The SORT stage will be present in the executionStages object of the explain('executionStats') output if a blocking (in-memory) sort took place.
+> SORT스테이지는 인메모리 정렬이 발생한 경우 executionStats에서 표시된다
+
+* True
+
+> You check the executionStats for a query using an index and see the following output:
+```
+{
+  executionSuccess: true,
+  nReturned: 2,
+  executionTimeMillis: 0,
+  totalKeysExamined: 3,
+  totalDocsExamined: 3,
+…
+}
+```
+
+* A. MongoDB had to scan an extra document
+* B. Two documents were returned
+* C. MongoDB had to scan an extra index key
+  * 실제로 리턴한 값(2) 보다 많은 데이터를 읽음(3)
+
+오답
+* D. This query is not using an index
+  * totalKeysExamined 에서 데이터를 3건 읽었다는 것은 인덱스를 읽었다는 것 = 인덱스를 사용했다는 것
 
 ### Lesson 4: Wildcard Indexes
+* 멀티키 인덱스를 생성할 때, 해당 필드 하위 필드를 모두 인덱싱 하고자 할 때...
+* `db.<collection>.createIndex({"<parent_field>.$**": 1})`
+* `db.<collection>.createIndex({"$**": 1})` : 모든 필드에 인덱싱
+
+> Why should you use a wildcard index to support queries in a MongoDB collection instead of a regular index? (Select one.)
+
+* C. Wildcard indexes can support queries against any field, even if that field is unknown at the time of querying.
+
+> Given the following query:
+```
+db.people.find({ "metadata.likes": "golfing", "metadata.age": 30 })
+```
+> Which of the following indexes would support all the fields in the query? (Select one.)
+
+* D. db.people.createIndex({ ‘metadata.$**’: 1 })
 
 ### Lesson 5: Partial Indexes
+* _id에는 설정 불가능
+* 지정된 필터 표현식을 충족하는 문서만 인덱싱
+
+> When should you use a partial index? (Select one.)
+
+* A. To index documents that match a specified filter document.
+
+> Given the following query:
+```
+db.zips.find({ state: "AZ", pop: { $gte: 20000} })
+```
+> Which Partial index will support this query? (Select one.)
+
+* A. db.zips.createIndex( { state: 1 }, { partialFilterExpression: { pop: { $gte: 10000 } } } );
 
 ### Lesson 6: Sparse Indexes
+Sparse Indexes
+* `db.<collection>.createIndex()`
+* 필드 값이 null이어도 허용
+* parse vs sparse
+  * 값에 상관 없이 필드 유무 여부만 중요한 경우에는 sparse 인덱스가 유리함
+
+> Which of the following statements about sparse indexes are true? (Select all that apply.) 
+
+* A. Sparse indexes only create index entries for documents that have null or non-null values for the indexed field.
+* C. Sparse indexes will not be chosen by the query planner if it means the query results will be incomplete.
+
+오답
+* B. Sparse indexes are used to support queries against documents that meet a specified filter expression.
+* D. Sparse indexes only create index entries for documents that have non-null values for the indexed field.
+
+> Given the following index:
+```
+db.collection.createIndex({ stock: 1 }, { sparse: true })
+```
+> Which document will be indexed? (Select one.)
+
+* B. { sku: 121, product_name: "Bread", price: 2, stock: 50 }
 
 ### Lesson 7: Clustered Indexes
+* 쿼리 성능을 향상시키고 disk 사용량, IO를 줄임
+* TTL 인덱스로 구성되었을 때 메모리캐시 사용을 향상시키고 TTL 성능 향상시킴
+
+> How does a clustered index in MongoDB differ from a regular index? (Select all that apply.)
+
+* A. Clustered indexes arrange documents in order based on their index key.
+* C. Clustered indexes store the index key alongside the documents themselves.
+* D. Clustered index keys eliminate the need for an additional TTL (time to live) index.
+
+오답
+* B. Clustered indexes optimize query performance for a given field over regular indexes.
+
+> When can we create a clustered index? (Select one.)
+
+* A. When creating the clustered collection
+
+> You run a query against a clustered collection, as shown below:
+```
+db.weather.find({ "metadata.sensorId": 5578 })
+```
+> The clustered collection has an internal clustered index and a secondary index that is eligible for the query. Which of the following two indexes will be automatically selected by the query planner to support the query? (Select one.)
+```
+// internal clustered index - db.runCommand( { listCollections: 1 } )
+{
+  name: 'system.buckets.weather',
+  type: 'collection',
+  options: {
+    validator: { ... },
+    clusteredIndex: true,
+    timeseries: {
+      timeField: 'timestamp',
+      metaField: 'metadata',
+      granularity: 'hours',
+      bucketMaxSpanSeconds: 2592000
+    }
+  },
+  info: { ... }
+}
+
+// secondary index - db.weather.getIndexes()
+{
+  v: 2,
+  key: { 'metadata.sensorId': 1 },
+  name: 'metadata.sensorId_1'
+}
+```
+
+* B. Secondary index
 
 ### Lesson 8: Time Series Collections
+* 클러스터된 콜렉션에 자연스럽게 사용할 수 있는 데이터셋 -> Time Series Collection : 클러스터링 된 콜렉션
+* Time Series Collections : 시간 경과에 따라 변경되는 모든 종류의 데이터
+
+생성방법
+```
+db.createCollection("weather", {
+  timeseries: {
+    timeField: "timestamp",
+    metaField: "metadata",
+    granularity: "hours",
+  },
+})
+```
+* timeField : BSON Date 타입을 포함하는 도큐먼트 필드
+* metaField : (선택사항) 시계열과 관련된 레이블, 태그. 
+* granularity : (선택사항) 데이터를 수집할 빈도
+
+> What is the correct definition of a time series collection? (Select one.) 
+
+* A. Time series collections efficiently store time series data. In time series collections, writes are organized so that data from the same source is stored alongside other data points from a similar point in time.
+
+> What are the advantages of providing a metaField field when creating a time series collection? (Select one.)
+```
+db.createCollection("stockprice", {
+  timeseries: {
+    timeField: "timestamp",
+    metaField: "metadata",
+    granularity: "seconds",
+  },
+});
+```
+* C. Allows for better organization by attaching additional information directly to the data
+
+오답
+* A. Improves the efficiency of querying data that changes over time
+* B. Allows you to visualize the data using third party tools
 
 ### Lesson 9: How to monitor indexes
+`$indexStats`
+* 인덱스의 세부사항에 대해 제공 -> aggregate 로 확인
+* 필드
+  * `name` : 인덱스 명
+  * `key` : 인덱스 키
+  * `accesses` : 인덱스 사용 정보
+  * `accesses.ops` : 인덱스가 사용된 횟수 -> 사용하지 않는 인덱스 판별 가능
+  * `accesses.since` : 인덱스에 대한 작성 시간
+  * `host` : 호스트 명
 
+Database Profiler
+* 인덱스 사용 프로파일링
+* db.setProfilingLevel(<level>, <option>)
+
+> What will the following command return? (Select one.)
+```
+db.customers.aggregate([{ $indexStats: {} }]);
+```
+
+* B. An array of documents, each representing an index specification document.
+
+> What happens when the database profiler is enabled on a database? (Select one.)
+
+* A. Operations are captured and recorded inside the database under a capped collection named system.profile.
+
+오답
+* B. A web server is enabled to support queries on the database.
+* C. You’ll receive suggestions for actions you can take on your database to improve performance.
+* D. The MongoDB instance is profiled in order to find the source of out-of-memory errors.
+
+### Unit 9 정리
+Lesson 1: How Indexes Work
+- [Indexes in MongoDB](https://www.mongodb.com/docs/manual/indexes/)
+- [What is Indexing in a Database?](https://www.mongodb.com/basics/database-index)
+- [Compound Indexes](https://www.mongodb.com/docs/manual/core/index-compound/)
+- [MongoDB University: Indexing I (Prerequisite course)](https://learn.mongodb.com/courses/mongodb-indexes)
+- [Index Best Practices](https://www.mongodb.com/blog/post/performance-best-practices-indexing)
+
+Lesson 2: Index Usage Details via Explain
+- [Explain Method](https://www.mongodb.com/docs/manual/reference/method/db.collection.explain/)
+- [Explain Verbosity Levels](https://www.mongodb.com/docs/manual/reference/method/db.collection.explain/#std-label-explain-method-verbosity)
+- [Explain Results](https://www.mongodb.com/docs/manual/reference/explain-results/)
+- [Query Plans](https://www.mongodb.com/docs/manual/core/query-plans/)
+
+Lesson 3: Optimized Compound Indexes
+- [Compound Indexes](https://www.mongodb.com/docs/manual/core/index-compound/)
+- [The ESR (Equality Sort Range) Rule](https://www.mongodb.com/docs/manual/tutorial/equality-sort-range-rule/#std-label-esr-indexing-rule)
+- [Tips and Tricks for Effective Indexing](https://www.slideshare.net/mongodb/mongodb-local-toronto-2019-tips-and-tricks-for-effective-indexing)
+- [Create Indexes to Support Your Queries](https://www.mongodb.com/docs/manual/tutorial/create-indexes-to-support-queries/#std-label-create-indexes-to-support-queries)
+
+Lesson 4: Wildcard Indexes
+- [Wildcard Indexes in MongoDB](https://www.mongodb.com/docs/manual/core/index-wildcard/)
+- [Create a WildCard Index on All Fields](https://www.mongodb.com/docs/v7.0/core/indexes/index-types/index-wildcard/create-wildcard-index-all-fields/)
+- [Include or Exclude Fields in a Wildcard Index](https://www.mongodb.com/docs/v7.0/core/indexes/index-types/index-wildcard/create-wildcard-index-multiple-fields/#std-label-create-wildcard-index-multiple-fields)
+- [Wildcard Index Restrictions](https://www.mongodb.com/docs/v7.0/core/indexes/index-types/index-wildcard/reference/restrictions/#std-label-wildcard-index-restrictions)
+- [Compound Wildcard Indexes (new in 7.0)](https://www.mongodb.com/docs/v7.0/core/indexes/index-types/index-wildcard/index-wildcard-compound/)
+
+Lesson 5: Partial Indexes
+- [Partial Indexes in MongoDB](https://www.mongodb.com/docs/manual/core/index-partial/)
+- [Partial Index Restrictions](https://www.mongodb.com/docs/manual/core/index-partial/#restrictions)
+
+Lesson 6: Sparse Indexes
+- [Sparse Indexes in MongoDB](https://www.mongodb.com/docs/manual/core/index-sparse/)
+- [Indexes that are Sparse by Default](https://www.mongodb.com/docs/manual/core/index-sparse/#indexes-that-are-sparse-by-default)
+
+Lesson 7: Clustered Indexes
+- [Clustered Collections in MongoDB](https://www.mongodb.com/docs/upcoming/core/clustered-collections/)
+- [Clustered Index Reference](https://www.mongodb.com/docs/upcoming/reference/method/db.createCollection/#std-label-db.createCollection.clusteredIndex)
+- [expireAfterSeconds](https://www.mongodb.com/docs/upcoming/reference/method/db.createCollection/#std-label-db.createCollection.expireAfterSeconds)
+- [Clustered Collection Examples](https://www.mongodb.com/docs/upcoming/core/clustered-collections/#std-label-clustered-collections-examples)
+
+Lesson 8: Time Series Collections
+- [Time Series](https://www.mongodb.com/docs/manual/core/timeseries-collections/)
+- [Create a Time-Series Collection](https://www.mongodb.com/docs/manual/core/timeseries/timeseries-procedures/#std-label-timeseries-create-query-procedures)
+- [Add Secondary Indexes to Time-Series Collections](https://www.mongodb.com/docs/manual/core/timeseries/timeseries-secondary-index/)
+- [List Time-Series Collections in a Database](https://www.mongodb.com/docs/manual/core/timeseries/timeseries-check-type/)
+- [Set up Automatic Removal](https://www.mongodb.com/docs/manual/core/timeseries/timeseries-automatic-removal/)
+- [Time Series Product Overview](https://www.mongodb.com/time-series)
+
+Lesson 9: How to Monitor Indexes
+- [$indexStats Operator](https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexStats/)
+- [MongoDB Database Profiler](https://www.mongodb.com/docs/manual/tutorial/manage-the-database-profiler/)
+- [Reading Profiler Output](https://www.mongodb.com/docs/manual/reference/database-profiler/)
+- [db.setProfilingLevel()](https://www.mongodb.com/docs/manual/reference/method/db.setProfilingLevel/#mongodb-method-db.setProfilingLevel)
+- [Database Profiler Verbosity Levels](https://www.mongodb.com/docs/manual/reference/method/db.setProfilingLevel/#std-label-set-profiling-level-level)
+
+# 강의 외 정리 - MongoDB 완벽가이드 Chapter 5 인덱싱
