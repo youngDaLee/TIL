@@ -626,3 +626,12 @@ Lesson 9: How to Monitor Indexes
 - [Database Profiler Verbosity Levels](https://www.mongodb.com/docs/manual/reference/method/db.setProfilingLevel/#std-label-set-profiling-level-level)
 
 # 강의 외 정리 - MongoDB 완벽가이드 Chapter 5 인덱싱
+## 5.1 인덱싱 소개
+* 인덱스를 사용해서 쿼리 성능 향상 가능
+* 인덱스를 사용하지 않으면 풀스캔(테이블스캔)
+
+[Indexes in MongoDB](https://www.mongodb.com/docs/manual/indexes/)
+* 
+
+### 5.1.1 복합인덱스(Compound index)
+* 하나 이상의 필드로 구성된 인덱스
