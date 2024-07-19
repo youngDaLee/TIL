@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-// Go 언어는 모두 main 패키지의 main 함수로부터 시작함. 필수
-func main() {
-	ex15()
-}
-
 func variable() {
 	var x int = 1 // Go 정수 선언 기본
 	y := 1        // 축약형. 오른쪽 데이터 타입에 따라 바로 변수 선언
@@ -107,4 +102,42 @@ func ex15() {
 	// %v : 알아서 타입 판단해서 출력
 	x, y, z := true, "nice", 3.141592
 	fmt.Printf("%T: %v\n%T: %v\n%T: %v\n", x, x, y, y, z, z)
+}
+
+func ex16() {
+	x := 4
+	x += 2
+	y := 3
+	y -= 1
+	println(x % y)
+}
+
+func ex17() {
+	a, b, c, d := 2, 3, 4, 5
+	println((b >= a) && !(c < d))
+}
+
+func ex18() {
+	// 비트연산자
+	x, y := 7, 2
+	println(x & y)
+	println(x | y)
+	println(x ^ y)
+	println(x << y)
+	println(x >> y)
+}
+
+func ex19() {
+	// 대입 & 포인터 연산자
+	x := "hello"
+	var y *string
+	y = &x // 변수의 주소를 가리키게 됨
+	println(x)
+	*y = "world"
+	println(x)
+}
+
+// Go 언어는 모두 main 패키지의 main 함수로부터 시작함. 필수
+func main_() {
+	ex19()
 }
