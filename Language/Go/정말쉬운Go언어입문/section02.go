@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/pkg/errors"
 )
 
 func ex20() {
@@ -177,6 +181,162 @@ func ex34() {
 	println(strings.Contains("seefood", "bar"))
 }
 
+func ex35() {
+	// 외장패키지
+	// go mod init main 으로 패키지 초기화 시켜준 다음에 외장패키지 설치 가능했음
+	// mod가 env 같은건가..?
+	x := "hello"
+	spew.Dump(x)
+}
+
+func ex36() {
+	// myContains("seafood", "foo")
+}
+
+func ex37(str1, str2 string) {
+	num1, err := strconv.Atoi(str1)
+	if err != nil {
+		panic(err)
+	}
+
+	num2, err := strconv.Atoi(str2)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%d / %d = %d\n", num1, num2, num1/num2)
+}
+
+func ex38() {
+	err := fn()
+	fmt.Printf("%+v", err)
+}
+
+func fn() error {
+	e1 := errors.New("error")
+	e2 := errors.Wrap(e1, "inner")
+	return errors.Wrap(e2, "outer")
+}
+
+func ex39() {
+	variadicExample("red")
+	variadicExample("red", "green", "yellow")
+}
+
+func variadicExample(s ...string) {
+	fmt.Printf("%#v\n", s)
+}
+
+func ex40(i ...int) {
+	// 가변인자는 함수에서 하나만 사용 가능
+	// 다른 인자와 섞어 사용할땐 마지막에 사용해야 함
+	sum := 0
+	for _, num := range i {
+		sum += num
+	}
+
+	println(sum)
+}
+
+// ===== 구조체
+type rectangle struct {
+	length  float64
+	breadth float64
+	color   string
+	geo     geometry
+}
+
+type geometry struct {
+	area      int
+	perimeter int
+}
+
+func ex41() {
+	// spew.Dump(rectangle{10.5, 12.5, "red"})
+}
+
+func ex42() {
+	var rect1 rectangle
+	rect1.breadth = 15
+	rect1.length = 10
+	rect1.geo.area = int(rect1.breadth) * int(rect1.breadth)
+	spew.Dump(rect1)
+
+	rect2 := rectangle{10, 20, "Green", geometry{200, 60}}
+	spew.Dump(rect2)
+
+	rect3 := rectangle{length: 5, breadth: 10}
+	spew.Dump(rect3)
+
+	rect4 := new(rectangle)
+	rect4.length = 5
+	rect4.breadth = 12
+	spew.Dump(rect4)
+}
+
+type Student struct {
+	Name   string
+	Age    int
+	Scores []Score
+}
+
+type Score struct {
+	Subject string
+	Score   int
+}
+
+func ex43() {
+	s1 := Student{
+		Name: "Dy",
+		Age:  26,
+		Scores: []Score{
+			Score{
+				Subject: "Math",
+				Score:   90,
+			},
+			{
+				Subject: "Physics",
+				Score:   80,
+			},
+		},
+	}
+	spew.Dump(s1)
+}
+
+// 메소드 리시버 -> 구조체의 메서드를 정의하는 방법
+type rect struct {
+	length  float64
+	breadth float64
+	color   string
+}
+
+func (r rect) area() float64 {
+	return r.length * r.breadth
+}
+
+func (r rect) perimeter() float64 {
+	return 2 * (r.breadth + r.length)
+}
+
+func ex44() {
+	s1 := rect{
+		length:  3,
+		breadth: 5,
+		color:   "blue",
+	}
+	spew.Dump(s1.area(), s1.perimeter())
+}
+
+func ex45() {
+	r1 := rect{5, 4, "yellow"}
+	r2 := r1  // 복사(주소복사X)
+	r3 := &r1 // 주소복사
+	r2.color = "blue"
+	spew.Dump(r1) // yellow
+	r3.color = "magenta"
+	spew.Dump(r1) // magenta
+}
+
 func main() {
-	ex34()
+	ex45()
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func variable() {
@@ -135,6 +136,10 @@ func ex19() {
 	println(x)
 	*y = "world"
 	println(x)
+}
+
+func myContains(str, subStr string) bool {
+	return strings.Contains(str, subStr)
 }
 
 // Go 언어는 모두 main 패키지의 main 함수로부터 시작함. 필수
