@@ -336,7 +336,3 @@ func ex45() {
 	r3.color = "magenta"
 	spew.Dump(r1) // magenta
 }
-
-func main() {
-	ex45()
-}
