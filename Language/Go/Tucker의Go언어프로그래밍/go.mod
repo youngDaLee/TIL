@@ -1,3 +1,6 @@
-module goproject/hello
+// {프로젝트 저장소URL, 고유한 패키지 경로 등}
+// {...}/{해당 이름으로 빌드 파일(모듈 이름) 생성됨}
+module goproject/main
 
+// go 버전
 go 1.22.5
