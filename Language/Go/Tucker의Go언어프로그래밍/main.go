@@ -12,9 +12,6 @@
 */
 package main
 
-import "fmt"
-
 func main() {
-	c, success := DivideName(5, 0)
-	fmt.Println(c, success)
+	funcTypeEx()
 }
