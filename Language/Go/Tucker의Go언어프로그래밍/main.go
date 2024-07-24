@@ -13,5 +13,5 @@
 package main
 
 func main() {
-	funcTypeEx()
+	gorutineChannerEx()
 }
