@@ -331,7 +331,39 @@ physical volumn
 * vg0 : 600MB 의 logical volun(mdb라고 불리는..)
   * /var/lib/mongodb 에 위치해있다
 
+```
+// lock
+> db.fsyncLock();
+
+// create snapshot
+sudo lvcreate --size 100M --snapshot --name mdb-snapshot /dev/vg0/mdb;
+
+// unlock
+> db.fsyncUnlock();
+
+// archive snapshot
+sudo dd status=progress if=/dev/vg0/mdb-snapshot | gzip > mdb-snapshot.gz
+
+// restore archive snapshot
+sudo lvcreate --size 1G --name mdb-new vg0;
+gzip -d -c mdb-snapshot.gz | sudo dd status=progress of=/dev/vg0/mdb-new
+sudo systemctl stop -l mongod; sudo systemctl status -l mongod;
+sudo rm -r /var/lib/mongodb/*
+sudo umount /var/lib/mongodb
+sudo mount /dev/vg0/mdb-new /var/lib/mongodb
+```
+
+> Which Linux command can be used to restore an archived volume snapshot? (Select one.)
+
+* a. dd
+
+> Volume snapshots should be stored separately from the MongoDB deployment. (True or false.)
+
+* a. True
+
 ### Lesson 4: Filesystem archives on a MongoDB Server
+백업을 위한 filesystem archives
+* Physical volumn(vg0)
 
 ### Lesson 5: Backing up a MongoDB Deployment
 
@@ -342,7 +374,6 @@ physical volumn
 ## Unit 14. Self-Managed Upgrades & Maintenance
 ### Lesson 1: Zero Downtime Maintenance wit a MongoDB Deployment
 유지보수를 할 때에도 고가용성을 잃지 않을 수 있다
-
 
 ### Lesson 2: MongoDB Client Driver upgrades
 
