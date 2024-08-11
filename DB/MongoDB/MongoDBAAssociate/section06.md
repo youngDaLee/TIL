@@ -423,17 +423,212 @@ Lesson 7: Configuring a Replica Set in a MongoDB Deployment
 
 ## Unit 16. Self-Managed Database Security
 ### Lesson 1: Introduction to Security
+Authentication
+* id, pw
+
+Authorization
+* Role-Based Access Control(RBAC) : 사용자에게 직접 권하능ㄹ 주는게 아니라 역할에 권한을 부여함
+
+Auditing
+* 데이터, 데이터베이스 구성에 대한 변경사항을 모니터링하고 기록하는 프로세스
+
+> A user is required to enter a valid username and password in order to access a database. This is an example of which security practice? (Select one.)
+
+* a. Authentication
+
+> You grant a user permission to create and modify roles and users on the sample_analytics database. This is an example of which security practice? (Select one.)
+
+* c. Authorization
+
+> At your company, you're in charge of making sure only the portions of data necessary for the Security team to complete their tasks are accessible. You must ensure that the team cannot access data they do not need. Which practice is the best choice for you to implement? (Select one.)
+
+* b. Role-Based Access Control (RBAC)
+
+> What is the purpose of auditing in the context of database security? (Select all that apply.)
+
+* b. Support the analysis of security incidents
+* d. Comply with regulatory requirements
 
 ### Lesson 2: Enabling Authentication for a Self-Managed MongoDB Deployment
+Default : SCRAM
+* 암호화 키에 의해 보호되는 응답을 교환함으로서 사용자를 판별
+
+user administrator
+* user 권한 관리 책임
+* 역할을 작성하고 수정할 수 있는 super database    
+```
+db.createUser(
+{
+user: "globalUserAdmin",
+pwd: passwordPrompt(),
+roles: [
+{ role: "userAdminAnyDatabase", db: "admin" }
+]
+}
+)
+```
+
+> What is the default authentication mechanism for MongoDB? (Select one.)
+
+* c. SCRAM
+
+> You assign a user the userAdminAnyDatabase role. What types of actions can the user take with this role only? (Select all that apply.)
+
+* a. Create users and roles
+* c. Modify users and roles
 
 ### Lesson 3: Establishing Authorization for a Self-Managed MongoDB Deployment
+Autorization : 유저에게 권한 부여
+
+> You want to create users on a self-managed MongoDB deployment. What do you need to do before you can do so? (Select all that apply.)
+
+* a. Enable access control
+* c. Create a user administrator
+
+> You need to create a new user and want to assign roles to them at the same time. What method should you use? (Select one.)
+
+* b. db.createUser()
 
 ### Lesson 4: Security Auditing in MongoDB
+Autiting : 모니터링, 감사를 위함. 규제요구사항 준수하고 사고분석을 지원하기 위함
+* Syslog - JSON format
+* Console - JSON format
+* File - JSON or BSON format
+
+autit message filed
+* atype - action type
+* result - error code of the action
+
+> Which destinations can audit events be printed to when using a self-managed MongoDB instance? (Select all that apply.) 
+
+* a. Console
+* b. Syslog
+* d. BSON file
+
+> Given the following configuration file, where are audit events printed on this MongoDB instance? (Select one.)
+
+```
+# mongod.conf
+
+
+storage:
+ dbPath: /var/lib/mongodb
+
+
+systemLog:
+ destination: file
+ logAppend: true
+ path: /var/log/mongodb/mongod.log
+
+
+net:
+ port: 27017
+ bindIp: 127.0.0.1
+
+
+processManagement:
+ timeZoneInfo: /usr/share/zoneinfo
+
+
+security:
+ authorization: enabled
+
+
+auditLog:
+ destination: file
+ format: BSON
+ path: /var/log/mongodb/auditLog.bson
+```
+
+* c. /var/log/mongodb/auditLog.bson
 
 ### Lesson 5: Introduction to Encryption Concepts
+Encryption : 허용된 사용자만 읽을 수 있도록 데이터를 인코딩
+* Transport encryption
+  * TLS
+* Encryption at rest
+  * DB서버에서 데이터 파일을 암호화 하는 프로세스
+* In-use encryption
+  * CSFLE
+
+> What are some limitations of encryption at rest? (Select all that apply.)
+
+* a. Managing encryption keys can be a challenge.
+* b. It does not protect against attacks on data in memory.
+* d. It does not protect against insider threats.
+
+> A doctor’s office stores patient medical records in a database. To provide an extra layer of security for medical diagnosis information, you want to use a method of encryption in which this data is encrypted in the client application before it’s sent over the network to the MongoDB servers. What type of encryption should you use? (Select one.)
+
+* b. Client-Side Field Level Encryption (CSFLE)
 
 ### Lesson 6: Encryption in Self-Managed MongoDB Deployments
+* Transport encryption
+  * TLS
+* Encryption at rest
+  * DB서버에서 데이터 파일을 암호화 하는 프로세스
+* In-use encryption
+  * CSFLE
+
+> How does MongoDB provide encryption at rest? (Select all that apply.)
+
+* a. Client-Side Field Level Encryption (CSFLE)
+* c. Encrypted Storage Engine
+
+> How does MongoDB support encryption of data in transit? (Select all that apply.)
+
+* c. Transport Layer Security (TLS)
+* b. Client-Side Field Level Encryption (CSFLE)
+
+> How does MongoDB support in-use encryption? (Select all that apply.)
+
+* a. Client-Side Field Level Encryption (CSFLE)
+* b. Automatic encryption
 
 ### Lesson 7: Enabling Network Encryption For a Self-Managed MongoDB Deployment
+ReplicaSet 간 TLS연결 -> 자체 연결 배치에서 디폴트로 TLS 사용
+
+> You want to enable Transport Layer Security (TLS) for a self-managed MongoDB deployment at your organization. Which certificate should you or your organization obtain prior to enabling TLS? (Select one.)
+
+* b. A valid TLS certificate issued by a certificate authority for each server in the deployment
+
+> You want to specify that a server uses and accepts only TLS-encrypted connections. What should you set the net.tls.mode configuration file setting to? (Select one.)
+
+* c. requireTLS
 
 ### Unit 16 정리
+
+Lesson 1: Introduction to Security
+- [Authentication](https://www.mongodb.com/docs/manual/core/authentication/)
+- [Role-Based Access Control](https://www.mongodb.com/docs/manual/core/authorization/)
+- [Auditing](https://www.mongodb.com/docs/manual/core/auditing/cation/)
+
+Lesson 2: Enabling Authentication for a Self-Managed MongoDB Deployment
+- [Enable Access Control](https://www.mongodb.com/docs/manual/tutorial/enable-authentication/#std-label-enable-access-control)
+- [Use SCRAM to Authenticate Clients](https://www.mongodb.com/docs/manual/tutorial/configure-scram-client-authentication/)
+- [Localhost Exception](https://www.mongodb.com/docs/manual/core/localhost-exception/)
+
+Lesson 3: Establishing Authorization for a Self-Managed MongoDB Deployment
+- [Role-Based Access Control](https://www.mongodb.com/docs/manual/core/authorization/)
+- [Create a User](https://www.mongodb.com/docs/manual/tutorial/create-users/)
+- [Built-In Roles](https://www.mongodb.com/docs/manual/reference/built-in-roles/)
+- [Authenticate a User](https://www.mongodb.com/docs/manual/tutorial/authenticate-a-user/)
+- [List Users](https://www.mongodb.com/docs/manual/tutorial/list-users/)
+- [Modify Access for an Existing User](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/#modify-access-for-an-existing-user)
+
+Lesson 4: Security Auditing in MongoDB
+- [Auditing](https://www.mongodb.com/docs/manual/core/auditing/)
+- [System Event Audit Messages](https://www.mongodb.com/docs/manual/reference/audit-message/)
+- [Audit Options](https://www.mongodb.com/docs/manual/reference/program/mongod/#audit-options)
+
+Lesson 5: Introduction to Encryption Concepts
+- [MongoDB Data Encryption](https://www.mongodb.com/products/capabilities/security/encryption#:~:text=Encryption%20at%2Drest%20is%20a,is%20AES%2D256%20via%20OpenSSL.)
+
+Lesson 6: Encryption in Self-Managed MongoDB Deployments
+- [Encryption at Rest](https://www.mongodb.com/docs/manual/core/security-encryption-at-rest/)
+- [Configure Encryption](https://www.mongodb.com/docs/manual/tutorial/configure-encryption/)
+- [TLS/SSL (Transport Encryption)](https://www.mongodb.com/docs/manual/core/security-transport-encryption/)
+- [Client-Side Field Level Encryption](https://www.mongodb.com/docs/manual/core/csfle/)
+
+Lesson 7: Enabling Network Encryption for a Self-Managed MongoDB Deployment
+- [Upgrade a Cluster to Use TLS/SSL](https://www.mongodb.com/docs/manual/tutorial/upgrade-cluster-to-ssl/)
+- [net Options](https://www.mongodb.com/docs/manual/reference/configuration-options/?_ga=2.149826678.1926118966.1686611566-1191611927.1686611566#net-options)
