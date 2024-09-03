@@ -52,3 +52,34 @@ Embedding vs Reference
   * one-to-one : 몇 번의 Read. 다량의 Read
   * one-to-many : 몇 번의 Read. 다량의 Read
   * many-to-many : 한몇 번의 Read. 다량의 Read
+
+패턴
+* 4~50개 이상의 패턴으로 전략을 제공
+* Computation
+  * 근사값, 계산형
+* Grouping
+  * 버켓, 예외, 사전할당
+* Life Cycle
+  * 아카이브, 문서버져닝, envelope, 스키마 버져닝
+* Polymorphism
+  * 상속, 단일 컬렉션
+* Relationships
+  * Attribute, ...
+
+## 패턴
+Extended Refernce Pattern
+* Join을 줄이기 위해 필요한 부분을 따로 가져가서 저장하는 형태
+* 레퍼런스형태의 조인을 하지 않고 데이터를 읽을 수 있도록 하는 패턴.
+
+Computed Pattern
+* 미리 계산된 내용을 데이터에 집어넣는 패턴
+* CPU 사용량을 줄여줌
+
+Archive Pattenr
+* 규제에 대해정의.
+* 해당되는 곳에 데이터를 모아둠(S3같은)
+* 사전에 메모해두고 찾기 위해서... 아카이브 해주는 것. 사전에 키를 넣어주는 것
+
+Schema versioning Pattern
+* 권고하는 패턴
+* 기존 데이터에 스키마 구조가 변경이 되었을 때 마이그레이션 해야 하는 이슈가 있음 -> 사전에 스키마 버전에 대해 기재를 해주면 마이그레이션 시 downtime 갖지 않고 원하는 데이터만 갖춰서 마이그레이션 가능하다.
