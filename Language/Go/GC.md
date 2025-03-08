@@ -130,3 +130,126 @@ GOMELIMIT
 - 최신 패키지를 잘 살펴보자 -> 더 나은게 나올수도!!!
 
 
+# GC를 튜닝하는 방법
+* STW(Stop The World, GC가 동작하는동안 프로그램 동작 멈추는 현상)를 줄이자
+* 불필요한 Heap영역 할당을 줄이자
+
+## STW 줄이는 방법
+GOMELIMIT
+- GOGC 단점을 보완하여 나온 방법
+- 프로그램이 사용할 수 있는 메모리 사용량 한계선을 정하는 설정. GOMELIMIT값만큼 메모리 사용량 올라가는 경우만 GC가 수행됨
+- 프로그램이 사용할 수 있는 최대 메모리 한계선 정한 뒤, 그보다 작은 값을 GOMELIMIT으로 설정하여 튜닝
+
+### GOMELIMIT 실제 실행 결과
+실행 로그 분석
+```shell
+gc 1 @0.014s 1%: 0.021+1.0+0.043 ms clock, 0.21+0.36/1.4/0.21+0.43 ms cpu, 3->4->1 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+```
+- `gc 1` : 프로그램 실행 후 첫 번째 GC 이벤트 발생
+- `**@0.014s**` → 프로그램 시작 후 **0.014초(14ms) 경과** 시점에서 GC 실행됨
+- `**1%**` → GC가 애플리케이션 실행 중 차지한 **CPU 비율** (낮을수록 좋음)
+- `0.021+1.0+0.043 ms clock` : GC 시간 분석
+	- **0.021ms** → GC의 **STW(Stop-The-World) 시작 시간**(GC실행을 위해 모든 고루틴 중지하는 시간)
+	- **1.0ms** → **Mark 단계 (병렬 실행)** : 살아있는 객체 마킹
+	- **0.043ms** → **STW 종료 시간** 
+- `0.21+0.36/1.4/0.21+0.43 ms cpu` : CPU 사용량 분석
+	- **0.21ms** → **STW 시작 시 CPU 사용량**
+	- **0.36ms / 1.4ms / 0.21ms** → **각 단계별 CPU 사용 시간**
+		- 0.36ms → Initial mark 단계
+		- 1.4ms → Mark + Sweep 단계 (병렬 실행)
+		- 0.21ms → Final mark 단계
+	- **0.43ms** → **STW 종료 시 CPU 사용량**
+- `3->4->1 MB` : 힙 메모리 변화
+	- 3MB: GC 시작 전 사용된 힙메모리
+	- 4MB: GC 실행 중 최대 힙 메모리 사용량
+	- 1MB: GC 완료 후 남은 살아있는 객체 크기
+- `4 MB goal` : 힙 크기 목표
+- 0 MB stacks, 0 MB globals 스택, 글로벌 변수 메모리
+- 10 P : 프로세서 수(go 런타임에 할당된 프로세서 수)
+
+GOMELIMIT 설정이 있는 로그
+```shell
+  GODEBUG=gctrace=1 GOMEMLIMIT=4GiB ./main  
+gc 1 @0.014s 1%: 0.021+1.0+0.043 ms clock, 0.21+0.36/1.4/0.21+0.43 ms cpu, 3->4->1 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 2 @0.019s 2%: 0.046+0.90+0.038 ms clock, 0.46+0.14/1.6/0.51+0.38 ms cpu, 4->5->3 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 3 @0.075s 1%: 0.086+0.70+0.004 ms clock, 0.86+0.048/1.8/2.1+0.041 ms cpu, 8->8->5 MB, 8 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 4 @0.173s 0%: 0.081+0.92+0.020 ms clock, 0.81+0.069/2.2/3.1+0.20 ms cpu, 10->11->6 MB, 11 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 5 @0.209s 0%: 0.044+1.0+0.004 ms clock, 0.44+0.084/2.7/4.2+0.043 ms cpu, 13->13->8 MB, 14 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 6 @0.260s 0%: 0.048+1.0+0.13 ms clock, 0.48+0.058/2.8/4.9+1.3 ms cpu, 16->16->9 MB, 17 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 7 @0.321s 0%: 0.046+1.2+0.014 ms clock, 0.46+0.064/3.3/5.3+0.14 ms cpu, 19->19->11 MB, 20 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 8 @0.339s 0%: 0.059+1.2+0.009 ms clock, 0.59+0.055/3.3/5.7+0.099 ms cpu, 22->22->13 MB, 23 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 9 @0.442s 0%: 0.043+1.4+0.13 ms clock, 0.43+0.12/3.9/5.9+1.3 ms cpu, 26->26->15 MB, 28 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 10 @0.785s 0%: 0.15+4.0+0.035 ms clock, 1.5+0.31/11/21+0.35 ms cpu, 29->31->23 MB, 32 MB goal, 0 MB stacks, 0 MB globals, 10 P
+```
+
+GOMELIMIT 설정이 없는 로그
+```shell
+ GODEBUG=gctrace=1 ./main
+gc 1 @0.041s 0%: 0.025+1.0+0.013 ms clock, 0.25+0.89/1.5/0.26+0.13 ms cpu, 3->4->1 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 2 @0.049s 0%: 0.029+0.83+0.015 ms clock, 0.29+0.26/1.1/1.8+0.15 ms cpu, 3->3->3 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 3 @0.073s 0%: 0.040+0.73+0.025 ms clock, 0.40+0/1.4/1.8+0.25 ms cpu, 7->7->4 MB, 7 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 4 @0.216s 0%: 0.060+0.83+0.009 ms clock, 0.60+0.63/2.0/3.0+0.090 ms cpu, 9->9->5 MB, 9 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 5 @0.235s 0%: 0.081+0.72+0.003 ms clock, 0.81+0.31/1.9/3.3+0.034 ms cpu, 11->11->7 MB, 12 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 6 @0.254s 0%: 0.065+1.0+0.009 ms clock, 0.65+0.23/2.8/4.6+0.096 ms cpu, 14->14->8 MB, 15 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 7 @0.280s 0%: 0.046+1.1+0.059 ms clock, 0.46+0/3.0/4.5+0.59 ms cpu, 17->17->9 MB, 18 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 8 @0.307s 0%: 0.050+1.3+0.012 ms clock, 0.50+0.056/3.5/5.7+0.12 ms cpu, 19->20->11 MB, 20 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 9 @0.325s 0%: 0.071+1.1+0.004 ms clock, 0.71+0.093/3.3/5.8+0.045 ms cpu, 22->23->14 MB, 24 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 10 @0.371s 0%: 0.079+1.6+0.004 ms clock, 0.79+0/4.5/7.3+0.046 ms cpu, 27->27->15 MB, 28 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 11 @0.507s 0%: 0.057+3.2+0.079 ms clock, 0.57+0.069/9.3/17+0.79 ms cpu, 30->31->25 MB, 32 MB goal, 0 MB stacks, 0 MB globals, 10 P
+```
+1. **GC 실행 빈도 (GC 횟수)**
+	- GOMEMLIMIT O 
+		- 총 10회 실행
+		- GC 실행 간격이 점점 늘어남 (0.014s → 0.019s → 0.075s → ... → 0.785s)
+	- GOMEMLIMIT X
+		- 총 11회 실행
+		- GC 실행 빈도가 더 **짧은 간격**으로 이루어짐 (0.041s → 0.049s → 0.073s → ... → 0.507s)
+2. **힙 크기 변화 (X->Y->Z MB**)
+	- GOMEMLIMIT O
+		```
+		3->4->1 MB
+		4->5->3 MB
+		8->8->5 MB
+		10->11->6 MB
+		13->13->8 MB
+		16->16->9 MB
+		19->19->11 MB
+		22->22->13 MB
+		26->26->15 MB
+		29->31->23 MB
+		```
+		남은 메모리, 목표 힙 크기 점진적 증가
+	- GOMEMLIMIT X
+		```
+		3->4->1 MB
+		3->3->3 MB
+		7->7->4 MB
+		9->9->5 MB
+		11->11->7 MB
+		14->14->8 MB
+		17->17->9 MB
+		19->20->11 MB
+		22->23->14 MB
+		27->27->15 MB
+		30->31->25 MB
+		```
+		마찬가지로 점진적으로 증가하긴 하지만 더 많이 GC가 실행되었음에도 힙 크기가 비슷한 속도로 증가함 
+3. **GC 수행 시간 및 CPU 사용량 (clock / cpu)
+- GOMEMLIMIT O
+```
+0.021+1.0+0.043 ms clock, 0.21+0.36/1.4/0.21+0.43 ms cpu
+0.046+0.90+0.038 ms clock, 0.46+0.14/1.6/0.51+0.38 ms cpu
+0.086+0.70+0.004 ms clock, 0.86+0.048/1.8/2.1+0.041 ms cpu
+...
+0.15+4.0+0.035 ms clock, 1.5+0.31/11/21+0.35 ms cpu
+```
+	초반에는 GC 시간이 짧고 후반으로 갈수록 시간 증가 -> 사용률 빈도 줄이게 됨
+- GOMEMLIMIT X
+```
+0.025+1.0+0.013 ms clock, 0.25+0.89/1.5/0.26+0.13 ms cpu
+0.029+0.83+0.015 ms clock, 0.29+0.26/1.1/1.8+0.15 ms cpu
+0.040+0.73+0.025 ms clock, 0.40+0/1.4/1.8+0.25 ms cpu
+...
+0.057+3.2+0.079 ms clock, 0.57+0.069/9.3/17+0.79 ms cpu
+```
+	초반부터 일정한 GC 시간 유지
