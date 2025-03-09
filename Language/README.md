@@ -29,6 +29,9 @@
 | [자바_코딩_완벽_가이드](./Java/자바_코딩_완벽_가이드/) | 자바_코딩_완벽_가이드 읽고 정리 |
 
 ### Growth Avengers
+
+|           title           | description  |
+|:-------------------------:|:-------------|
 | [Java의정석](https://github.com/growth-avengers/java-jungsuk/tree/main/dayoung) | Java의정석 읽고 정리 |
 | [토비의 스프링](https://github.com/growth-avengers/toby-spring) | 토비의 스프링 읽고 정리 |
 
