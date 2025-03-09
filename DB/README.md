@@ -8,9 +8,9 @@
 |   [MySQL](./MySQL)   | MySQL 공부 기록   |
 |   [Deadlock](./Deadlock.md)   | Deadlock 공부 기록   |
 |   [MongoDB-CreateIndex](./MongoDB-CreateIndex.md)   | MongoDB 인덱스 생성 방법 공부 기록 |
-|   [MongoDB-CreateIndex](./MongoDB인덱스.md)   | MongoDB 인덱스 공부 기록 |
-|   [MongoDB-CreateIndex](./MongoDB트랜잭션.md)   | MongoDB 트랜잭션 공부 기록 |
-|   [MongoDB-CreateIndex](./optimizer.md)   | optimizer 공부 기록 |
+|   [MongoDB인덱스](./MongoDB인덱스.md)   | MongoDB 인덱스 공부 기록 |
+|   [MongoDB트랜잭션](./MongoDB트랜잭션.md)   | MongoDB 트랜잭션 공부 기록 |
+|   [optimizer](./optimizer.md)   | optimizer 공부 기록 |
 
 
 ### MongoDB

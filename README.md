@@ -18,8 +18,8 @@
 |         title         | description   |
 |:---------------------:|:--------------|
 |   [MongoDB-CreateIndex](DB/MongoDB-CreateIndex.md)   | MongoDB 인덱스 생성 방법 공부 기록 |
-|   [MongoDB-CreateIndex](DB/MongoDB인덱스.md)   | MongoDB 인덱스 공부 기록 |
-|   [MongoDB-CreateIndex](DB/MongoDB트랜잭션.md)   | MongoDB 트랜잭션 공부 기록 |
+|   [MongoDB인덱스](DB/MongoDB인덱스.md)   | MongoDB 인덱스 공부 기록 |
+|   [MongoDB트랜잭션](DB/MongoDB트랜잭션.md)   | MongoDB 트랜잭션 공부 기록 |
 | [context](Language/Go/context.md) | Go언어의 context 공부 |
 | [GC](Language/Go/GC.md) | Go언어의 가비지컬렉터 공부 |
 | [gorutine](Language/Go/gorutine.md) | 고루틴 개념 공부 |
