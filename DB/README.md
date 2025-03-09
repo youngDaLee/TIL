@@ -1,16 +1,29 @@
+## DB
+> 데이터베이스 공부 기록
 
-## MySQL
-- [RealMySQL::ch04.트랜잭션과 잠금](MySQL/RealMySQL_ch04.md)
-- [RealMySQL::ch05.인덱스](MySQL/RealMySQL_ch05.md)
-- [RealMySQL::ch06.실행 계획](MySQL/RealMySQL_ch06.md)
-- [RealMySQL::ch07.쿼리 작성 및 최적화 7.1~7.3](MySQL/RealMySQL_ch07.md)
-- [RealMySQL::ch07.쿼리 작성 및 최적화 7.4~](MySQL/RealMySQL_ch07_2.md)
-- [RealMySQL::ch11.스토어드 프로그램](MySQL/RealMySQL_ch11.md)
+|         title         | description   |
+|:---------------------:|:--------------|
+| [친절한SQL튜닝](./친절한SQL튜닝) | 친절한SQL튜닝 읽고 정리 |
+| [MongoDB](./MongoDB) | MongoDB 공부 기록 |
+|   [MySQL](./MySQL)   | MySQL 공부 기록   |
+|   [Deadlock](./Deadlock.md)   | Deadlock 공부 기록   |
+|   [MongoDB-CreateIndex](./MongoDB-CreateIndex.md)   | MongoDB 인덱스 생성 방법 공부 기록 |
+|   [MongoDB-CreateIndex](./MongoDB인덱스.md)   | MongoDB 인덱스 공부 기록 |
+|   [MongoDB-CreateIndex](./MongoDB트랜잭션.md)   | MongoDB 트랜잭션 공부 기록 |
+|   [MongoDB-CreateIndex](./optimizer.md)   | optimizer 공부 기록 |
 
-## MongoDB
-- [RealMongoDB::ch01.MongoDB](MongoDB/RealMongoDB_ch01.md)
-- [RealMongoDB::ch02.스토리지 엔진](MongoDB/RealMongoDB_ch02.md)
-- [RealMongoDB::ch03.복제](MongoDB/RealMongoDB_ch03.md)
-- [RealMongoDB::ch03.샤딩](MongoDB/RealMongoDB_ch04.md)
-- [RealMongoDB::ch08.쿼리 개발과 튜닝](MongoDB/RealMongoDB_ch08.md)
-- [RealMongoDB::ch09.실행계획 및 최적화](MongoDB/RealMongoDB_ch09.md)
+
+### MongoDB
+|         title         | description   |
+|:---------------------:|:--------------|
+| [MongoDB2024](./MongoDB/MongoDB2024/) | MongoDB2024 Seoul 컨퍼런스 들은 내용 정리 |
+| [MongoDBAAssociate](./MongoDB/MongoDBAAssociate/) | MongoDBAAssociate 준비하며 강의 보고 정리한 내용|
+|   [RealMongoDBMongoDB](./MongoDB)   | RealMongoDB읽고 정리  |
+
+
+### RealMySQL
+
+|         title         | description   |
+|:---------------------:|:--------------|
+| [RealMySQL8.0](./MySQL/RealMySQL8.0/) | RealMySQL8.0 읽고 정리 |
+|   [RealMongoDBMongoDB](./MySQL)   | RealMySQL 읽고 정리  |
