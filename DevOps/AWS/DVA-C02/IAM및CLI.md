@@ -53,3 +53,66 @@ MFA devices options in AWS
 - Universla 2nd Factor : 물리장치(usb형식의) YubiKey등...
 - Hardware Key Fob MFA Device : 젬알토 등(번호를 수동으로 확인 가능)
 - Hardware Key Fob MFA Device for AWS GovCloud(US) : 미국정부 클라우드 쓰고 있으면 SurePass 사용 가능...
+
+## AWS Accesekey, CIL, SDK
+AWS에 접근하는 방법
+- 관리 콘솔(ManagementConsole) : pw+MFA
+- CIL : access key로 보호됨
+- SDK : code에서 접근
+
+AccessKey 생성 방법
+- IAM > Uesr > 유저별로 Create access key
+- 내 콘솔에서 `aws config` 로 설정....
+
+AWS 클라우드쉘
+- 일부 리전에서만 사용 가능
+- AWS에서 제공하는 쉘
+
+## IAM Role
+- AWS가 사용하는 롤...
+- Common roles : EC2 인스턴스롤, Lambda Function Role, CloudFormation Role, ... 등
+
+보안도구
+- Credentials Report(account-level) : credential 상태를 리포트로 다운받아 볼 수 있음(csv)
+- Access Advisor(user-level) : 유저에게 부여된 서비스 권한과 유저의 마지막 접속 시간 확인 가능
+
+IAM 모범사례
+- AWS 계정설정 할 때를 제외하고는 루트계정을 사용하지 말 것
+- One physical user = One AWS user
+- 유저를 그룹에 할당하고, 그룹에 권한을 할당해서 보안이 그룹 수준에서 관리되도록 해야 함
+- 강력한 password policy를 만들 것 
+- MFA를 사용하여 보안 강화할 것
+- Roles를 생성하여 권한을 부여할 것
+- IAM Credentials Report, Access Advisor로 관리하고
+- IAM user, Access Key를 절대 공유하지 말 것
+
+## IAM의 공동 책임 모델 (Shard Responsibility Model)
+- AWS가 책입지는것 : Infrastructure, Configuraation, vulneability analysis, Compliance validation
+- 나 : User/MFA/IAM tools/permision 등
+
+## Quiz
+
+1) IAM 역할의 올바른 설명은?
+- AWS 서비스에서 사용할 AWS 서비스 요청을 위한 권한 집합을 정의하는 IAM 엔터티
+
+2) IAM 보안도구는?
+- IAM 자격증명 모고서
+
+3) IAM 유저와 관련하여 잘못된 것은?
+- IAM 사용자는 루트 계정 자격증명을 사용하여 AWS 서비스에 액세스 합니다
+
+4) IAM 모범사례는?
+- 루트 계정을 사용하지 않음
+
+5) IAM 정책(policy)는?
+- AWS서비스에 요청을 보내는 권한의 집합을 정의하고 IAM 사용자, 사용자 그룹 및 IAM 역할이 사용할 수 있는 JSON 문서
+
+6) IAM 권한 에서 어떤 원칙을 지켜야 하는지
+- 최소 권한 부여
+
+7) 루트 계정 보안을 높이려면?
+- MFA 활성화
+
+8) IAM 유저그룹에는 IAM 유저 및 기타 사용자 그룹이 포함될 수 있다
+- 거짓 : 유저만 포함 가능(그룹 포함 불가)
+
