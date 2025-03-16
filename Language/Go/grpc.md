@@ -41,7 +41,9 @@ HTTP(Hypertext Transfer Protocol)
 
 
 REST(Representational State Transfer)
-- HTTP 기반의 API 설계 방식
+- (X) HTTP 기반의 API 설계 방식
+  - 추가: 살짝 애매할 수 있는 용어 -> CRUD 기반의 통신 방식. HTTP 메서드 쓰는 방식(POST, PUT 등...) 
+  - RESTful API 의 정의로 보는게 나을듯...?
 - HTTP 요청을 사용해 데이터를 주고받는 규칙
 - REST 특징
   - HTTP 메서드(GET,POST,PUT,DELETE) tkdyd
