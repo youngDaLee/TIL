@@ -74,3 +74,9 @@ classic ports
 - 80 = HTTP
 - 443 = HTTPS
 - 3389 = RDP(Remote Desktop Protocol) : 윈도우에서 로그인하기 위함
+
+
+## SSH
+- mac, linux, windows 10 이상에서 사용 가능
+- windows 10 미만에서는 putty 사용(window 10이상에서도 putty 사용 가능)
+- EC2 Instance Connect를 통해서는 mac, linux, windows 10 이하, 이상 모두 사용 가능
