@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package protouser;
+
+option go_package = "github.com/lee-dayoung/TIL/Language/Go/code/grpc/proto;userpb";
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}
