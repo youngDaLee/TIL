@@ -31,7 +31,7 @@ func protoPayloadSize(u *userpb.User) {
 	fmt.Printf("Protobuf Payload Size: %d bytes\n", len(data))
 }
 
-func main() {
+func comparePayloadSize() {
 	u := User{
 		ID:    1,
 		Name:  "Dayoung",
@@ -49,4 +49,8 @@ func main() {
 	JSON Payload Size: 53 bytes
 	Protobuf Payload Size: 30 bytes
 	*/
+}
+
+func main() {
+	comparePayloadSize()
 }
