@@ -9,12 +9,21 @@ import (
 	"time"
 
 	echopb "github.com/lee-dayoung/grpc-benchmark/grpc/proto"
+	"github.com/vmihailenco/msgpack"
 	"google.golang.org/grpc"
 )
 
 const (
-	testCount = 1000
+	testCount = 10000
 )
+
+type EchoRequest struct {
+	Message string `msgpack:"message"`
+}
+
+type EchoResponse struct {
+	Message string `msgpack:"message"`
+}
 
 func callREST() {
 	client := &http.Client{}
@@ -52,13 +61,50 @@ func callGRPC() {
 	fmt.Printf("[gRPC] Total time for %d requests: %v\n", testCount, elapsed)
 }
 
+func callRESTMsgPack() {
+	client := &http.Client{}
+	url := "http://localhost:8080/echo"
+	start := time.Now()
+
+	// 1. JSON → MessagePack
+	reqBody := EchoRequest{Message: "hello"}
+	var buf bytes.Buffer
+	if err := msgpack.NewEncoder(&buf).Encode(reqBody); err != nil {
+		log.Fatalf("msgpack encode error: %v", err)
+	}
+
+	// 2. POST 요청
+	req, err := http.NewRequest("POST", url, &buf)
+	if err != nil {
+		log.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/msgpack")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 3. MessagePack 응답 디코딩
+	var resBody EchoResponse
+	if err := msgpack.NewDecoder(resp.Body).Decode(&resBody); err != nil {
+		log.Fatalf("msgpack decode error: %v", err)
+	}
+
+	elapsed := time.Since(start)
+	fmt.Printf("[RESTMsgPack] Total time for %d requests: %v\n", testCount, elapsed)
+}
+
 func main() {
 	/*
 		=== Starting Benchmark ===
-			[REST] Total time for 1000 requests: 279.148958ms
-			[gRPC] Total time for 1000 requests: 53.305833ms
+		[REST] Total time for 10000 requests: 2.489068375s
+		[gRPC] Total time for 10000 requests: 495.642834ms
+		[RESTMsgPack] Total time for 10000 requests: 1.451667ms
 	*/
 	fmt.Println("=== Starting Benchmark ===")
 	callREST()
 	callGRPC()
+	callRESTMsgPack()
 }
