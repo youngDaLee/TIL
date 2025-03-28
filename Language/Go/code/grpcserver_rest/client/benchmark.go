@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	testCount = 10000
+	testCount = 1000
 )
 
 func callREST() {
@@ -55,8 +55,8 @@ func callGRPC() {
 func main() {
 	/*
 		=== Starting Benchmark ===
-			[REST] Total time for 1000 requests: 267.129125ms
-			[gRPC] Total time for 1000 requests: 55.399958ms
+			[REST] Total time for 1000 requests: 279.148958ms
+			[gRPC] Total time for 1000 requests: 53.305833ms
 	*/
 	fmt.Println("=== Starting Benchmark ===")
 	callREST()
