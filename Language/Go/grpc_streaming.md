@@ -22,4 +22,12 @@
 - 완전한 스트림 기반 통신
 - ex) 채팅, 실시간 게임 데이터
 
+## 다른 통신 방식과 차이점
+### gRPC Streaming vs Redis Pub/Sub
+- gRPC Streaming 은 단일 연결에서 지속적인 송수신
+- Redis Pub/Sub은 subscriber에게 메세지를 broadcast 하는 구조
+  - 채널을 통해 단방향 메세지를 뿌림
 
+### gRPC Streaming vs Socket
+- Socket은 자유도는 높지만 고현 복잡성도 큼
+- gRPC Streaming은 gRPC문법에 따라 흐름제어, 메세지 타입 정의까지 포함하여 유지보수가 용이하고 타입 안정성이 큼
