@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chat;
+option go_package = "proto/chat;chatpb";
+
+service ChatService {
+    rpc Chat (stream Message) returns (stream Message);
+}
+
+message Message {
+    string user = 1; // The name of the user sending the message
+    string text = 2; // The content of the message
+    int64 timestamp = 3; // The time the message was sent, in milliseconds since epoch
+}
