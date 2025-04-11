@@ -31,6 +31,3 @@
 ### gRPC Streaming vs Socket
 - Socket은 자유도는 높지만 고현 복잡성도 큼
 - gRPC Streaming은 gRPC문법에 따라 흐름제어, 메세지 타입 정의까지 포함하여 유지보수가 용이하고 타입 안정성이 큼
-
-## gRPC vs WebSocket
-
