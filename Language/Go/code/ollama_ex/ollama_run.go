@@ -13,7 +13,7 @@ type OllamaChunk struct {
 	Done     bool   `json:"done"`
 }
 
-func main() {
+func ollama_run() {
 	payload := `{"model": "llama3", "prompt": "What is the capital of France?"}`
 	resp, err := http.Post("http://localhost:11434/api/generate", "application/json", strings.NewReader(payload))
 	if err != nil {
